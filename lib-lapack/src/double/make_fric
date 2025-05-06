@@ -1,0 +1,27 @@
+########################################################################
+#                                                                      #
+#           makefile for parallel LAPACK routines for GRASP92          #
+#                                                                      #
+########################################################################
+
+FC = f90
+
+OPT = -O
+
+OBJ = dlae2.o  dlaebz.o dlaev2.o dlagtf.o dlagts.o \
+      dlansp.o dlanst.o dlapy2.o dlarf.o  dlarfg.o \
+      dlarnv.o dlartg.o dlaruv.o dlascl.o dlaset.o \
+      dlasr.o  dlasrt.o dlassq.o dopgtr.o dopmtr.o \
+      dorg2l.o dorg2r.o dspevx.o dsptrd.o dstebz.o \
+      dstein.o dsteqr.o dsterf.o
+
+lapackd.a : $(OBJ)
+	ar r lapackd.a $(OBJ)
+#	ranlib lapackd.a
+	mv lapackd.a ../..
+
+#
+#   Implicit rule for compilation
+#
+.f.o:
+	$(FC) -c $(OPT) $<
