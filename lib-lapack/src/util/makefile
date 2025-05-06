@@ -1,0 +1,22 @@
+########################################################################
+#                                                                      #
+#           makefile for parallel LAPACK routines for GRASP92          #
+#                                                                      #
+########################################################################
+
+FC = f90
+
+OPT = -O
+
+OBJ = dlamch.o ilaenv.o lsame.o xerbla.o
+
+lapacku.a : $(OBJ)
+	ar r lapacku.a $(OBJ)
+	ranlib lapacku.a
+	mv lapacku.a ../..
+
+#
+#   Implicit rule for compilation
+#
+.f.o:
+	$(FC) -c $(OPT) $<
