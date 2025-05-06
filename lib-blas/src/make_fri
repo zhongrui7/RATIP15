@@ -1,0 +1,33 @@
+#
+FC=f90
+FFLAGS= -O
+#
+OBJECTS=      dasum.o    dgemv.o    drotg.o    dswap.o    \
+              dsyrk.o    dtrmv.o    daxpy.o    dger.o     \
+              dsbmv.o    dsymm.o    dtbmv.o    dtrsm.o    \
+              dcopy.o    dinit.o    dscal.o    dsymv.o    \
+              dtbsv.o    dtrsv.o    ddot.o     dmach.o    \
+              dspmv.o    dsyr.o     dtpmv.o    gather.o   \
+              dgbmv.o    dnrm2.o    dspr.o     dsyr2.o    \
+              dtpsv.o    idamax.o   dgemm.o    drot.o     \
+              dspr2.o    dsyr2k.o   dtrmm.o    scatter.o  \
+              iinit.o    daxpyi.o   dgthrz.o   ddoti.o    \
+              dgthr.o droti.o dsctr.o
+
+#
+blas :  $(OBJECTS)
+	ar r blas.a    dasum.o    dgemv.o    drotg.o    dswap.o    \
+              dsyrk.o    dtrmv.o    daxpy.o    dger.o     \
+              dsbmv.o    dsymm.o    dtbmv.o    dtrsm.o    \
+              dcopy.o    dinit.o    dscal.o    dsymv.o    \
+              dtbsv.o    dtrsv.o    ddot.o     dmach.o    \
+              dspmv.o    dsyr.o     dtpmv.o    gather.o   \
+              dgbmv.o    dnrm2.o    dspr.o     dsyr2.o    \
+              dtpsv.o    idamax.o   dgemm.o    drot.o     \
+              dspr2.o    dsyr2k.o   dtrmm.o    scatter.o  \
+              iinit.o    daxpyi.o   dgthrz.o   ddoti.o    \
+              dgthr.o droti.o dsctr.o
+	ranlib blas.a
+	mv blas.a ../blas.a
+#
+
