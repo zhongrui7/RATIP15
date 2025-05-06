@@ -1,0 +1,15 @@
+#
+FC=f90
+FFLAGS= -O
+#
+OBJECTS=      addabs.o   dvdson.o   newvec.o   ovflow.o   \
+              setup.o    dvdrvr.o   multbc.o   orthnrm.o  \
+              tstsel.o
+
+#
+dvdson :  $(OBJECTS)
+	ar ur dvdson.a addabs.o   dvdson.o   newvec.o   ovflow.o   \
+              setup.o    dvdrvr.o   multbc.o   orthnrm.o  \
+              tstsel.o
+	ranlib dvdson.a
+	mv dvdson.a ../../lib/libdvdson.a

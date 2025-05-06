@@ -1,0 +1,42 @@
+#!/bin/csh -f
+#
+###set echo
+set script_name=$0
+set script_name=$script_name:t
+#
+if ( -e makefile )   then
+   echo "   old makefile saved as makefile.OLD. "
+   mv makefile makefile.OLD
+endif
+#
+cat > makefile << EOFa
+#
+FC=f77
+FFLAGS= +O3
+##FFLAGS= -g
+#
+OBJECTS=      addabs.o   dvdson.o   newvec.o   ovflow.o   setup.o \
+              dvdrvr.o   multbc.o   orthnrm.o  tstsel.o
+
+#
+dvdson :  \$(OBJECTS)
+	ar r dvdson.a addabs.o   dvdson.o   newvec.o   ovflow.o   \ 
+	      setup.o dvdrvr.o   multbc.o   orthnrm.o  tstsel.o
+	ranlib dvdson.a
+	mv dvdson.a ../dvdson.a
+#
+EOFa
+#
+
+set fort_files=*.f
+#
+foreach file ( $fort_files )
+cat >> makefile  << EOFb
+
+${file:r}.o :  ${file:r}.f
+	\$(FC)  -c  \$(FFLAGS)  ${file:r}.f
+
+EOFb
+#
+end
+#
