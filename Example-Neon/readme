@@ -5,22 +5,22 @@ Usage of the files:
 
 Required is the most recent version of the RATIP tools, as published in Comp. Phys. Commun 183 (2012) 1525
 For the generation of the bound wave functions, a version of the GRASP is required. These examples are 
-designed for the development snapshot 2015.27.7, that can be obtained from: https://www-amdis.iaea.org/GRASP2K/
+designed for the development snapshot 2015.7.27, which can be obtained from: https://www-amdis.iaea.org/GRASP2K/
 
-For the compilation of both codes, we refer to the respective publications and readme files in both packages.
+For the compilation of both codes, please refer to the respective publications and readme files in both packages.
 
 In this first example, we want to perform a rough analysis of the double ionization of neon atoms, and an estimate 
 for the fluorescence yield in neon ions.
 
 The provided scripts perform all required computations and can be executed in order. 
-A brief description of each script is given below, a more detailed description of each script can be found inside them.
+A brief description of each script is given below; a more detailed description of each script can be found inside them.
 
 
 0. We need to initialize the environment and have the respective environment variables point to the 
    RATIP and GRASP codes by executing in a terminal:
    source 00_path.sh
 
-1. Definition of the nuclear data, such as nuclear charge and radius, nuclear moments, computational grid.
+1. Definition of the nuclear data, such as nuclear charge and radius, nuclear moments, and computational grid.
    Execute in a terminal as (and all following scripts too)
    ./01_iso.sh
 
@@ -34,21 +34,21 @@ A brief description of each script is given below, a more detailed description o
    ./04_wave_1+-gs.sh
 
 5. Generation of the wave functions for all configurations in doubly-ionized neon that can be reached by
-   Auger decays of K-Shell ionized neon ions.
+   Auger decays of K-shell ionized neon ions.
    ./05_wave_2+.sh
 
 6. Compute the photo ionization cross sections using RATIP's PHOTO component
    ./06_photo.sh
 
-7. Utilize RATIP's AUGER component to compute the Auger transition rates for the decays of K-Shell ionized
+7. Utilize RATIP's AUGER component to compute the Auger transition rates for the decays of K-shell ionized
    neon ions.
    ./07_auger.sh
    
-8. Compute the radiative transition rates for the decay of K-Shell ionized neon ions.
+8. Compute the radiative transition rates for the decay of K-shell ionized neon ions.
    ./08_fluorescence.sh
 
 
-10_all.sh: This scripts executes all previously described scripts in order.
+10_all.sh: This script executes all previously described scripts in order.
 
 
 11_clean.sh: This script removes all generated files and returns to a clean state.
