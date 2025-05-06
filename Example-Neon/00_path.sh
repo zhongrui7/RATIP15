@@ -1,4 +1,4 @@
 #!/bin/bash
 
 export g2k=$HOME/grasp/grasp2Kdev/bin
-export ratip=$HOME/RATIP/ratip-2012
+export ratip=$HOME/RATIP/RATIP15
