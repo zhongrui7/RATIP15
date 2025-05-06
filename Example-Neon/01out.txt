@@ -1,0 +1,32 @@
+ Enter the atomic number:
+ Enter the mass number (0 if the nucleus is to be modelled as a point source:
+ The default root mean squared radius is    2.8392531274733415       fm;
+ The default nuclear skin thickness is      2.2999999999999998       fm;
+ Revise these values?
+ Enter the mass of the neutral atom (in amu) (0 if the nucleus is to be static):
+ Enter the nuclear spin quantum number (I) (in units of h / 2 pi):
+ Enter the nuclear dipole moment (in nuclear magnetons):
+ Enter the nuclear quadrupole moment (in barns):
+ -----------------------------------------------------------
+ The Grasp2K grid is defined by:
+
+ R(i) = RNT*[ exp[ (i-1)*H ] - 1 ]
+   i  = 1, 2, ..., NNNP
+
+ The default grid parameters are:
+
+ RNT  (first grid point       ) =   1.99999999999999991E-006
+ H    (grid step-size         ) =   5.00000000000000028E-002
+ NNNP (max. no. of grid-points) =         2000
+ -----------------------------------------------------------
+
+ Do you want to revise these values (y/*)?
+ Default grid parameter values are kept!
+
+ Output file isodata successfully created. Happy computing!
+
+
+ RNUCLEUS
+ This program defines nuclear data and the radial grid
+ Outputfile: isodata
+

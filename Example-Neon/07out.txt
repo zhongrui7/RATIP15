@@ -1,0 +1,397 @@
+ AUGER: Calculation of Auger rates, non-radiative lifetimes, 
+  angular distribution parameters, and others (Fortran 95 version)
+  (C) Copyright by S Fritzsche and others, Kassel (2001).
+  
+ Enter a file name for the  auger.sum  file:
+ Enter the name of the isotope data file:
+ loading isotope data file ...
+  ... load complete;
+ Which units are to be used to enter and to print the energies of the continuum orbitals ?
+     A       : Angstrom;
+     eV      : electron volts;
+     Hartree : Hartree atomic units;
+     Hz      : Hertz;
+     Kayser  : [cm**(-1)];
+ Enter the maximal energy of the Auger transitions  (in eV) to built-up the radial grid;
+ Modify default set-up and printout of the program ?
+ Select individual transitions ?
+ Include exchange interactions into the generation of the continuum waves ?
+ Include Breit interactions to the Auger matrix ?
+ Calculate angular distribution parameters ?
+ Calculate spin polarization parameters ?
+ Sort transitions in ascending order of energy ?
+ Read in and apply experimental energies for the calculation of Auger rates and other properties ?
+ Auger rates are printed in SI units; use Hartree atomic units instead ?
+ Print all selected transitions and their energies before the computation starts (this is the default) ?
+ Print the CSF scheme each time a new one has been built ?
+ Print the results for each individual transition immediatly after its computation ?
+ Print the final results to a (.trn) transition amplitude file ?
+ Enter an (overall) shift of the Auger energies which applies to all transitions (ineV):
+  Use  0.  or   <cr>  if no shift need to be applied.
+ Enter a minimal energy (> =0.) of the free electron (ineV):
+  All other transitions are neglected from the computations;
+  use  0.  or   <cr>  if all possible transitions are to be taken into account.
+ Enter a maximal (-)kappa symmetry up to which continuum spinors are taken into account ?
+  2 (up to p-waves), 4(f), 6(i), 8(k), ...; 0 or <cr> to include all possible waves.
+ The physical speed of light in atomic units is   137.03598950000000      ;
+  revise this value ?
+ The default radial grid parameters for this case are:
+  rnt =   1.99999999999999991E-006 ;
+  h   =   5.00000000000000028E-002 ;
+  hp  =   2.44297503373473932E-002 ;
+  n   =        19509 ;
+  revise these values ?
+ Enter the name of the initial-state GRASP92 configuration symmetry list file:
+ Loading configuration symmetry list file ...
+  There are            4  relativistic subshells;
+  there are            1  relativistic CSFs;
+  ... load complete.
+ Enter the name of the final-state GRASP92 configuration symmetry list file:
+ Loading configuration symmetry list file ...
+  There are            4  relativistic subshells;
+  there are           10  relativistic CSFs;
+  ... load complete.
+ Enter the name of the initial-state GRASP92 mixing coefficient file:
+ Loading mixing coefficients file ...
+  ... load complete;
+ Enter the name of the final-state GRASP92 mixing coefficient file:
+ Loading mixing coefficients file ...
+  ... load complete;
+ Enter the name of the initial-state Radial WaveFunction File:
+  ... load complete;
+ Enter the name of the final-state Radial WaveFunction File:
+  ... load complete;
+ Initialize the set-up of the overlap integrals and transitions ...
+             10  transitions have been initialized and will be calculated in this run of the program.
+    ... initialization complete.
+  
+
+The following    10 transitions are selected:
+
+     I-level-F     I--J^P--F      Transition Energy       Orbital symmetries (emitted)
+                                     (in   eV)  
+    -----------------------------------------------------------------------------------
+       1 -   1    1/2+      2+      8.1032746E+02         d- d 
+       1 -   2    1/2+      1+      8.1024771E+02         s  d-
+       1 -   3    1/2+      0+      8.1021302E+02         s 
+       1 -   4    1/2+      2+      8.0690753E+02         d- d 
+       1 -   5    1/2+      0+      8.0381212E+02         s 
+       1 -   6    1/2+      2-      7.8374883E+02         p  f-
+       1 -   7    1/2+      1-      7.8367567E+02         p- p 
+       1 -   8    1/2+      0-      7.8363598E+02         p-
+       1 -   9    1/2+      1-      7.7149943E+02         p- p 
+       1 -  10    1/2+      0+      7.4546042E+02         s 
+    -----------------------------------------------------------------------------------
+ i, mpt =            1         631
+ i,wave_bound%rwf(i)%mtp =            1         631
+ i, mpt =            2         728
+ i,wave_bound%rwf(i)%mtp =            2         728
+ i, mpt =            3         800
+ i,wave_bound%rwf(i)%mtp =            3         800
+ i, mpt =            4         800
+ i,wave_bound%rwf(i)%mtp =            4         800
+ Bound-state electron density vanishes at R(  800) =   11.8979 a.u. at a step size Delta-R =    0.0235 a.u. 
+  
+ Maximal deviation after     1 iterations = 2.93300876E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 7.69541136E-01 2.67933595E-02
+ Maximal deviation after     3 iterations = 3.02205291E-02 1.05191691E-03
+ Maximal deviation after     4 iterations = 1.51770000E-03 5.28283096E-05
+ Maximal deviation after     5 iterations = 7.65389000E-05 2.66417640E-06
+ Maximal deviation after     6 iterations = 3.80969266E-06 1.32608298E-07
+ i,j,transition(i)%channel(j)%amplitude =            1           1 ( 7.95956047000089917E-005,-2.18742137025478624E-004)
+  
+ Maximal deviation after     1 iterations = 9.87296625E-03 1.00000000E+00
+ Maximal deviation after     2 iterations = 2.20344279E-04 2.27399054E-02
+ Maximal deviation after     3 iterations = 8.87182793E-06 9.15408283E-04
+ Maximal deviation after     4 iterations = 4.48979320E-07 4.63264301E-05
+ Maximal deviation after     5 iterations = 2.25474111E-08 2.32647920E-06
+ Maximal deviation after     6 iterations = 1.12487156E-09 1.16066109E-07
+ i,j,transition(i)%channel(j)%amplitude =            1           2 (-1.11283562798095479E-004, 3.00409904449917972E-004)
+  
+  
+  Results for Auger transition            1  -            1 :    1/2 +   ---->     2 +
+  --------------------------------------------------------------
+  
+    Energy     =    810.32745710928532      eV
+    Total rate =    40733235075.302811      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     d-      7.960E-05  -2.187E-04    -2.328E-04     1.407E+10     1.222E+00
+     d      -1.113E-04   3.004E-04     3.204E-04     2.666E+10     1.216E+00
+  
+  
+ Maximal deviation after     1 iterations = 4.42458479E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 2.32359039E-03 5.13154890E-02
+ Maximal deviation after     3 iterations = 2.90828284E-04 6.43250404E-03
+ Maximal deviation after     4 iterations = 2.64160127E-05 5.84378487E-04
+ Maximal deviation after     5 iterations = 1.88351597E-06 4.16678899E-05
+ Maximal deviation after     6 iterations = 1.09806042E-07 2.42917418E-06
+ Maximal deviation after     7 iterations = 5.31039485E-09 1.17478728E-07
+ i,j,transition(i)%channel(j)%amplitude =            2           1 ( 9.67001152463685150E-006, 1.42491843383576991E-005)
+  
+ Maximal deviation after     1 iterations = 2.93315676E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 8.85275596E-01 3.09004268E-02
+ Maximal deviation after     3 iterations = 3.37639450E-02 1.17810171E-03
+ Maximal deviation after     4 iterations = 1.68649841E-03 5.88461424E-05
+ Maximal deviation after     5 iterations = 8.56972749E-05 2.99019169E-06
+ Maximal deviation after     6 iterations = 4.24039515E-06 1.47957964E-07
+ i,j,transition(i)%channel(j)%amplitude =            2           2 ( 1.07031385916434672E-005,-6.80016104697046350E-006)
+  
+  
+  Results for Auger transition            1  -            2 :    1/2 +   ---->     1 +
+  --------------------------------------------------------------
+  
+    Energy     =    810.24771203352373      eV
+    Total rate =    118798613.78804396      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     s       9.670E-06   1.425E-05     1.722E-05     7.703E+07     5.309E+00
+     d-      1.070E-05  -6.800E-06     1.268E-05     4.177E+07     3.708E+00
+  
+  
+ Maximal deviation after     1 iterations = 4.42470848E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 2.50805638E-03 5.53740250E-02
+ Maximal deviation after     3 iterations = 2.99465557E-04 6.62304427E-03
+ Maximal deviation after     4 iterations = 2.61625707E-05 5.78734094E-04
+ Maximal deviation after     5 iterations = 1.82225980E-06 4.03101279E-05
+ Maximal deviation after     6 iterations = 1.05174858E-07 2.32656946E-06
+ Maximal deviation after     7 iterations = 5.11999004E-09 1.13259126E-07
+ i,j,transition(i)%channel(j)%amplitude =            3           1 (-1.17314453817687485E-004, 6.67352690824379082E-005)
+  
+  
+  Results for Auger transition            1  -            3 :    1/2 +   ---->     0 +
+  --------------------------------------------------------------
+  
+    Energy     =    810.21301618017003      eV
+    Total rate =    4731779075.5880547      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     s      -1.173E-04   6.674E-05     1.350E-04     4.732E+09     3.659E+00
+  
+  
+ Maximal deviation after     1 iterations = 2.94584867E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 6.88899942E-01 2.38347605E-02
+ Maximal deviation after     3 iterations = 2.76441899E-02 9.56242776E-04
+ Maximal deviation after     4 iterations = 1.39149442E-03 4.81334122E-05
+ Maximal deviation after     5 iterations = 7.00280698E-05 2.42235242E-06
+ Maximal deviation after     6 iterations = 3.48986061E-06 1.20718339E-07
+ i,j,transition(i)%channel(j)%amplitude =            4           1 (-3.97581873374635176E-003, 1.86230411999583102E-002)
+  
+ Maximal deviation after     1 iterations = 9.91743595E-03 1.00000000E+00
+ Maximal deviation after     2 iterations = 1.73081613E-04 1.77156940E-02
+ Maximal deviation after     3 iterations = 7.25577273E-06 7.42576495E-04
+ Maximal deviation after     4 iterations = 3.69089869E-07 3.77737373E-05
+ Maximal deviation after     5 iterations = 1.84332500E-08 1.88651274E-06
+ Maximal deviation after     6 iterations = 9.21705412E-10 9.43300287E-08
+ i,j,transition(i)%channel(j)%amplitude =            4           2 ( 5.09163092697968549E-003,-2.28478700632607466E-002)
+  
+  
+  Results for Auger transition            1  -            4 :    1/2 +   ---->     2 +
+  --------------------------------------------------------------
+  
+    Energy     =    806.90753186238237      eV
+    Total rate =    236526822683768.09      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     d-     -3.976E-03   1.862E-02     1.904E-02     9.419E+13     1.360E+00
+     d       5.092E-03  -2.285E-02    -2.341E-02     1.423E+14     1.352E+00
+  
+  
+ Maximal deviation after     1 iterations = 4.43392278E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 2.51955705E-03 5.55058053E-02
+ Maximal deviation after     3 iterations = 3.00771570E-04 6.63751103E-03
+ Maximal deviation after     4 iterations = 2.62921807E-05 5.80341644E-04
+ Maximal deviation after     5 iterations = 1.83366674E-06 4.04746222E-05
+ Maximal deviation after     6 iterations = 1.06082624E-07 2.34156846E-06
+ Maximal deviation after     7 iterations = 5.17891462E-09 1.14314511E-07
+ i,j,transition(i)%channel(j)%amplitude =            5           1 (-9.16963358350396385E-003,-5.47970426548429878E-003)
+  
+  
+  Results for Auger transition            1  -            5 :    1/2 +   ---->     0 +
+  --------------------------------------------------------------
+  
+    Energy     =    803.81211844529707      eV
+    Total rate =    29640533889448.266      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     s      -9.170E-03  -5.480E-03    -1.068E-02     2.964E+13     5.745E+00
+  
+  
+ Maximal deviation after     1 iterations = 1.32520094E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 4.51766498E-04 3.49242158E-02
+ Maximal deviation after     3 iterations = 1.25156199E-05 9.67087761E-04
+ Maximal deviation after     4 iterations = 8.46726402E-07 6.54276054E-05
+ Maximal deviation after     5 iterations = 3.74691125E-08 2.89528442E-06
+ Maximal deviation after     6 iterations = 1.97827546E-09 1.52863779E-07
+ i,j,transition(i)%channel(j)%amplitude =            6           1 (-3.72951009440683837E-003, 7.76972586184031082E-003)
+  
+ Maximal deviation after     1 iterations = 3.62379658E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 1.06843387E+00 3.01814486E-02
+ Maximal deviation after     3 iterations = 3.57334385E-02 1.00903847E-03
+ Maximal deviation after     4 iterations = 1.98336031E-03 5.60063110E-05
+ Maximal deviation after     5 iterations = 9.43295917E-05 2.66368745E-06
+ Maximal deviation after     6 iterations = 4.77636597E-06 1.34875450E-07
+ i,j,transition(i)%channel(j)%amplitude =            6           2 ( -0.0000000000000000     ,  0.0000000000000000     )
+  
+  
+  Results for Auger transition            1  -            6 :    1/2 +   ---->     2 -
+  --------------------------------------------------------------
+  
+    Energy     =    783.74882554565102      eV
+    Total rate =    19294092877309.523      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     p      -3.730E-03   7.770E-03    -8.618E-03     1.929E+13     2.694E+00
+     f-     -0.000E+00   0.000E+00     0.000E+00     0.000E+00     1.820E+00
+  
+  
+ Maximal deviation after     1 iterations = 3.28483034E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 1.56832839E+00 4.88620985E-02
+ Maximal deviation after     3 iterations = 5.43460961E-02 1.69346740E-03
+ Maximal deviation after     4 iterations = 2.90579444E-03 9.05460857E-05
+ Maximal deviation after     5 iterations = 1.43105145E-04 4.45923250E-06
+ Maximal deviation after     6 iterations = 7.17756807E-06 2.23656841E-07
+ Maximal deviation after     7 iterations = 3.58625342E-07 1.11749565E-08
+ i,j,transition(i)%channel(j)%amplitude =            7           1 ( 3.99039648281566614E-003,-3.63951469667640314E-003)
+  
+ Maximal deviation after     1 iterations = 1.32522899E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 6.39780811E-04 4.93321944E-02
+ Maximal deviation after     3 iterations = 2.26787245E-05 1.74919778E-03
+ Maximal deviation after     4 iterations = 1.15761489E-06 8.92851204E-05
+ Maximal deviation after     5 iterations = 5.90146269E-08 4.55171181E-06
+ Maximal deviation after     6 iterations = 2.90501694E-09 2.24059705E-07
+ Maximal deviation after     7 iterations = 1.46261235E-10 1.12809150E-08
+ i,j,transition(i)%channel(j)%amplitude =            7           2 ( 2.83929923392836799E-003,-2.57774164815977600E-003)
+  
+  
+  Results for Auger transition            1  -            7 :    1/2 +   ---->     1 -
+  --------------------------------------------------------------
+  
+    Energy     =    783.67567121573109      eV
+    Total rate =    11396957409459.893      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     p-      3.990E-03  -3.640E-03    -5.401E-03     7.577E+12     5.452E+00
+     p       2.839E-03  -2.578E-03    -3.835E-03     3.820E+12     5.450E+00
+  
+  
+ Maximal deviation after     1 iterations = 3.28489984E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 1.65205466E+00 5.14172291E-02
+ Maximal deviation after     3 iterations = 5.93353836E-02 1.84737214E-03
+ Maximal deviation after     4 iterations = 2.95991248E-03 9.21537082E-05
+ Maximal deviation after     5 iterations = 1.52941784E-04 4.76168031E-06
+ Maximal deviation after     6 iterations = 7.46778471E-06 2.32501560E-07
+ Maximal deviation after     7 iterations = 3.77498063E-07 1.17530020E-08
+ i,j,transition(i)%channel(j)%amplitude =            8           1 (-1.45290346157196703E-003,-3.54105386407867683E-003)
+  
+  
+  Results for Auger transition            1  -            8 :    1/2 +   ---->     0 -
+  --------------------------------------------------------------
+  
+    Energy     =    783.63597898998512      eV
+    Total rate =    3805416428312.6797      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     p-     -1.453E-03  -3.541E-03     3.828E-03     3.805E+12     3.531E+00
+  
+  
+ Maximal deviation after     1 iterations = 3.31139069E+01 1.00000000E+00
+ Maximal deviation after     2 iterations = 1.68056829E+00 5.18936266E-02
+ Maximal deviation after     3 iterations = 6.03175097E-02 1.86322042E-03
+ Maximal deviation after     4 iterations = 3.00026920E-03 9.26774579E-05
+ Maximal deviation after     5 iterations = 1.55407707E-04 4.80050122E-06
+ Maximal deviation after     6 iterations = 7.57623826E-06 2.34027910E-07
+ Maximal deviation after     7 iterations = 3.83243379E-07 1.18382823E-08
+ i,j,transition(i)%channel(j)%amplitude =            9           1 ( 3.66293640308944539E-003, 1.00587742972524253E-002)
+  
+ Maximal deviation after     1 iterations = 1.33613255E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 6.34522794E-04 4.86062158E-02
+ Maximal deviation after     3 iterations = 2.17422859E-05 1.66574341E-03
+ Maximal deviation after     4 iterations = 1.17574672E-06 9.00768851E-05
+ Maximal deviation after     5 iterations = 5.75969281E-08 4.41264485E-06
+ Maximal deviation after     6 iterations = 2.89485069E-09 2.21781757E-07
+ Maximal deviation after     7 iterations = 1.44499631E-10 1.10704784E-08
+ i,j,transition(i)%channel(j)%amplitude =            9           2 (-5.03443790889629515E-003,-1.41596234185199493E-002)
+  
+  
+  Results for Auger transition            1  -            9 :    1/2 +   ---->     1 -
+  --------------------------------------------------------------
+  
+    Energy     =    771.49942608923448      eV
+    Total rate =    88430281111581.047      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     p-      3.663E-03   1.006E-02    -1.070E-02     2.977E+13     3.491E+00
+     p      -5.034E-03  -1.416E-02     1.503E-02     5.866E+13     3.483E+00
+  
+  
+ Maximal deviation after     1 iterations = 4.51768960E-02 1.00000000E+00
+ Maximal deviation after     2 iterations = 2.51403192E-03 5.44451450E-02
+ Maximal deviation after     3 iterations = 2.83827214E-04 6.15742993E-03
+ Maximal deviation after     4 iterations = 2.35815951E-05 5.11677645E-04
+ Maximal deviation after     5 iterations = 1.57849168E-06 3.42507298E-05
+ Maximal deviation after     6 iterations = 8.84846981E-08 1.91997626E-06
+ Maximal deviation after     7 iterations = 4.25712016E-09 9.23726912E-08
+ i,j,transition(i)%channel(j)%amplitude =           10           1 (-1.10237469524952364E-002, 8.39054812490996134E-004)
+  
+  
+  Results for Auger transition            1  -           10 :    1/2 +   ---->     0 +
+  --------------------------------------------------------------
+  
+    Energy     =    745.46042254567715      eV
+    Total rate =    31749143960035.473      1/s
+  
+  Kappa            Amplitude        Real-Amplitude   Rate (1/s)     Phase
+  ---------------------------------------------------------------------------
+     s      -1.102E-02   8.391E-04    -1.106E-02     3.175E+13     7.597E-02
+  
+
+
+          ==================================================================
+          |  Summary of all Auger Rates, Angular Parameters and Lifetimes  |
+          ==================================================================
+
+
+ Individual and total Auger rates :
+ ----------------------------------
+
+ -------------------------------------------------------------------------------------
+  LevI-LevF   I- J / Parity -F     Energy (eV)     Rate (1/s)    Total Rate (1/s)   
+ -------------------------------------------------------------------------------------
+    1 -  1    1/2 +       2 +      8.10327E+02      4.073E+10       4.073E+10
+    1 -  2    1/2 +       1 +      8.10248E+02      1.188E+08       4.085E+10
+    1 -  3    1/2 +       0 +      8.10213E+02      4.732E+09       4.558E+10
+    1 -  4    1/2 +       2 +      8.06908E+02      2.365E+14       2.366E+14
+    1 -  5    1/2 +       0 +      8.03812E+02      2.964E+13       2.662E+14
+    1 -  6    1/2 +       2 -      7.83749E+02      1.929E+13       2.855E+14
+    1 -  7    1/2 +       1 -      7.83676E+02      1.140E+13       2.969E+14
+    1 -  8    1/2 +       0 -      7.83636E+02      3.805E+12       3.007E+14
+    1 -  9    1/2 +       1 -      7.71499E+02      8.843E+13       3.891E+14
+    1 - 10    1/2 +       0 +      7.45460E+02      3.175E+13       4.209E+14
+ -------------------------------------------------------------------------------------
+  
+ Total rate (a.u.)   =   1.01808124740524197E-002
+ Total rate (1/s) =    420888832172679.69     
+  
+  
+ Auger lifetimes, total rates and widths :
+ -----------------------------------------
+  
+ -------------------------------------------------------------------------------------------------------------------
+   LeveL               Lifetime           Total rate                                Width
+                       --------           ----------        -----------------------------------------------------
+                        Seconds              1/s               Hartrees            Kaysers               eV
+ -------------------------------------------------------------------------------------------------------------------
+      1             2.3759243D-15       4.2088883D+14       1.0180812D-02       2.2344301D+03       2.7703412D-01
+ -------------------------------------------------------------------------------------------------------------------
+  
+ AUGER complete ... .

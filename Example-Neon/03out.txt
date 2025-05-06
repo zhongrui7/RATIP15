@@ -1,0 +1,389 @@
+ 'Nonrelativistic' scheme?
+ Enter the list of nonrelativistic core subshells:
+ Enter the list of nonrelativistic peel subshells:
+ Redefine default maximum nonrelativistic peel subshell occupations?
+ Redefine default minimum nonrelativistic peel subshell occupations?
+ Enter a nonrelativistic reference peel subshell configuration (null if done):
+ Parity of configuration is even
+ Enter the J values for this configuration (null for all possible J values):
+ Enter a nonrelativistic reference peel subshell configuration (null if done):
+ Enter the maximum number of substitutions permitted (0, ..., 9):
+           4  relativistic subshells.            1  relativistic CSFs generated.
+ Default settings?  (y/n) 
+ RANGULAR
+ This program performs angular integration 
+ Input file:  rcsf.inp
+ Outputfiles: mcp.30, mcp.31, ....
+
+ Block            1 ,  ncf =            1
+ Loading CSF file ... Header only
+ There are/is            4  relativistic subshells;
+
+ Block            1 ,  ncf =            1
+ Loading CSF file for block            1
+ There are            1  relativistic CSFs... load complete;
+ Analysing sparse matrix array definition file ...          30
+  ... complete; density of non-zero elements of H(DC):            1 /           1
+ Sorting 0 T coefficients ...          31
+ Sorting 0 V(k=0) coefficients ...          32
+ Sorting 0 V(k=1) coefficients ...          33
+ Sorting 0 V(k=2) coefficients ...          34
+ Sorting 0 V(k=3) coefficients ...          35
+
+ Wall time:
+        0 seconds
+
+ Finish Date and Time:
+   Date (Yr/Mon/Day): 2017/04/07
+   Time (Hr/Min/Sec): 15/44/05.049
+   Zone: -0400
+
+ RANGULAR: Execution complete.
+ Default settings ?
+ The following subshell radial wavefunctions remain to be estimated:
+ 1s 2s 2p- 2p
+
+ Read subshell radial wavefunctions. Choose one below
+     1 -- GRASP2K File
+     2 -- Thomas-Fermi
+     3 -- Screened Hydrogenic
+ Enter the list of relativistic subshells:
+ All required subshell radial wavefunctions  have been estimated:
+Shell      e           p0        gamma        P(2)       Q(2)      MTP  SRC
+
+  1s   0.3333D+02  0.6102D+02  0.1000D+01  0.6257D-05 -0.2840D-09  284  T-F
+  2s   0.3658D+01  0.1691D+02  0.1000D+01  0.1734D-05 -0.1574D-09  307  T-F
+  2p-  0.2905D+01  0.1526D-01  0.1000D+01  0.4496D-11  0.4289D-07  309  T-F
+  2p   0.2898D+01  0.3773D+02  0.2000D+01  0.3967D-12 -0.3601D-16  309  T-F
+ RWFNESTIMATE: Execution complete.
+
+ RWFNESTIMATE
+ This program estimates radial wave functions 
+ for orbitals
+ Input files: isodata, rcsf.inp, optional rwfn file
+ Output file: rwfn.inp
+
+ Loading CSF file ... Header only
+ There are/is            4  relativistic subshells;
+
+ Default settings?  (y/n)  There are            1  blocks  (block   J/Parity   NCF):
+  1  1/2+     1
+
+ Enter ASF serial numbers for each block
+ Block            1    ncf =            1  id =  1/2+
+ Radial functions
+ 1s 2s 2p- 2p
+ Enter orbitals to be varied (Updating order)
+ Which of these are spectroscopic orbitals?
+ Enter the maximum number of SCF cycles:
+
+ RMCDHF
+ This program determines the radial orbitals   
+ and the expansion coefficients of the CSFs         
+ in a self-onsistent field proceedure               
+ Input file:  isodata, rcsf.inp, rwfn.inp, mcp.30, ...
+ Outputfiles: rwfn.out, rmix.out, rmcdhf.sum, rmcdhf.log
+
+ Loading CSF file ... Header only
+ There are/is            4  relativistic subshells;
+ Loading CSF File for ALL blocks 
+ There are            1  relativistic CSFs... load complete;
+ Loading Radial WaveFunction File ...
+
+ Average energy =  -9.6397106479D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.639710647948D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   1
+ --------------------
+
+Include Lagrange multipliers between:
+
+                1s    2s 
+
+Lagrange multipliers:
+
+                1s    2s    7.007793684D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.6426483D+01  1  6.362D+01  6.36D-01  2.42D-01 0.000   232   306  0  0
+  2s    2.5519255D+00  1  1.614D+01  1.53D-01  6.24D-02 0.000   262   312  0  1
+  2p-   1.5542516D+00  1  1.383D-02  3.06D-01  1.77D-01 0.000   270   317  0  0
+  2p    1.7243463D+00  1  3.561D+01  3.24D-01  1.30D-01 0.000   269   316  0  0
+  1s    3.7543161D+01  1  6.369D+01  1.10D-02 -4.91D-03 0.000   232   309  0  0
+
+ Average energy =  -9.6690416354D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.669041635381D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   2
+ --------------------
+
+Lagrange multipliers:
+
+                1s    2s    7.242124758D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.7535983D+01  1  6.368D+01  4.01D-03 -1.54D-03 0.000   232   309  0  0
+  2s    2.9562830D+00  1  1.702D+01  5.33D-02 -2.76D-03 0.100   262   312  0  1
+  2p-   1.8744923D+00  1  1.474D-02  8.39D-02  3.31D-03 0.100   267   316  0  0
+  2p    1.8309369D+00  1  3.628D+01  3.52D-02 -3.52D-03 0.100   268   316  0  0
+  2p-   1.8089171D+00  1  1.465D-02  7.65D-03  1.96D-03 0.190   268   316  0  0
+
+ Average energy =  -9.6727378289D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.672737828879D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   3
+ --------------------
+
+Lagrange multipliers:
+
+                1s    2s    7.515433074D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.7206998D+01  1  6.362D+01  1.10D-02 -3.83D-03 0.000   232   309  0  0
+  2s    2.8551365D+00  1  1.704D+01  8.27D-03  1.98D-03 0.190   262   312  0  1
+  2p-   1.8161455D+00  1  1.465D-02  2.53D-04 -4.14D-05 0.271   268   316  0  0
+  2p    1.8105757D+00  1  3.623D+01  4.02D-03  6.85D-04 0.190   268   316  0  0
+  1s    3.7223378D+01  1  6.362D+01  8.17D-04  2.91D-04 0.000   232   309  0  0
+
+ Average energy =  -9.6727634437D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.672763443693D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   4
+ --------------------
+
+Lagrange multipliers:
+
+                1s    2s    7.534521906D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.7223699D+01  1  6.362D+01  4.20D-04 -1.61D-04 0.000   232   309  0  0
+  2s    2.8610352D+00  1  1.703D+01  8.15D-04  1.81D-04 0.095   262   312  0  1
+  2p-   1.8206719D+00  1  1.467D-02  1.23D-03 -2.86D-04 0.136   268   316  0  0
+  2p    1.8132339D+00  1  3.623D+01  2.33D-04 -3.78D-05 0.095   268   316  0  0
+  2p-   1.8199249D+00  1  1.467D-02  8.01D-06 -5.33D-07 0.068   268   316  0  0
+
+ Average energy =  -9.6727641487D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.672764148721D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   5
+ --------------------
+
+Lagrange multipliers:
+
+                1s    2s    7.533737736D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.7221929D+01  1  6.362D+01  6.41D-06  9.43D-07 0.000   232   309  0  0
+  2s    2.8602241D+00  1  1.703D+01  2.21D-04  4.98D-05 0.048   262   312  0  1
+  2p-   1.8200631D+00  1  1.467D-02  3.13D-05 -7.43D-06 0.034   268   316  0  0
+  2p    1.8131544D+00  1  3.623D+01  1.41D-05  2.05D-06 0.048   268   316  0  0
+  2s    2.8602854D+00  1  1.703D+01  1.27D-05  9.42D-07 0.024   262   312  0  1
+
+ Average energy =  -9.6727641693D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.672764169275D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Iteration number   6
+ --------------------
+
+Lagrange multipliers:
+
+                1s    2s    7.532697105D-01
+                                         Self-            Damping
+Subshell    Energy    Method   P0    consistency  Norm-1  factor  JP MTP INV NNP
+
+  1s    3.7222278D+01  1  6.362D+01  2.86D-05  1.02D-05 0.000   232   309  0  0
+  2s    2.8602848D+00  1  1.703D+01  4.45D-07  1.03D-07 0.012   262   312  0  1
+  2p-   1.8200687D+00  1  1.467D-02  3.42D-06 -7.98D-07 0.017   268   316  0  0
+  2p    1.8131679D+00  1  3.623D+01  4.39D-06 -7.30D-07 0.024   268   316  0  0
+  1s    3.7222270D+01  1  6.362D+01  1.51D-06 -5.80D-07 0.000   232   309  0  0
+
+ Average energy =  -9.6727641693D+01 Hartrees
+
+Optimise on the following level(s):
+
+Level  1    Energy = -9.672764169274D+01    Weight =  1.00000D+00
+
+Weights of major contributors to ASF:
+
+Block Level J Parity      CSF contributions
+
+  1     1   1/2 +       1.0000
+                             1
+
+Generalised occupation numbers:
+
+   1.0000D+00  2.0000D+00  2.0000D+00  4.0000D+00
+
+ Wall time:
+        0 seconds
+
+ Finish Date and Time:
+   Date (Yr/Mon/Day): 2017/04/07
+   Time (Hr/Min/Sec): 15/44/05.082
+   Zone: -0400
+
+ RMCDHF: Execution complete.
+Created ne-1+-hole.w, ne-1+-hole.c, ne-1+-hole.m, ne-1+-hole.sum and ne-1+-hole.log
+rm: cannot remove `ne-1+-hole.cm': No such file or directory
+rm: cannot remove `ne-1+-hole-ci.sum': No such file or directory
+ RELCI: Set-up and diagonalization of a relativistic CI matrix including
+  Breit interactions and QED estimates (Fortran 95 version)
+  (C) Copyright by S Fritzsche and others, Kassel (2001).
+  
+ Enter a file name for the  relci.sum  file:
+ Enter the name of the configuration symmetry list file:
+ Loading configuration symmetry list file ...
+  There are            4  relativistic subshells;
+  there are            1  relativistic CSFs;
+  ... load complete.
+ Enter the name of the isotope data file:
+ loading isotope data file ...
+  ... load complete;
+ Modify default set-up and printout of the program ?
+ Include contributions of the frequency-independent Breit interaction ?
+ Include vacuum polarization contributions to H ?
+ Include specific mass shift contributions to H ?
+ Estimate contributions from self-energy ?
+ Store the effective interaction strengths in memory ?
+  This should always be true for a on-fly calculation of the Hamiltonian matrix.
+ Precalculate and keep Hamiltonian matrix in memory ?
+ Diagonalize the full Hamiltonian matrix ?
+ (I.e. independent of the parameter hamiltonian_fullmatrix.)
+ Which units are to be used to enter and to print the energies of the continuum orbitals ?
+     A       : Angstrom;
+     eV      : electron volts;
+     Hartree : Hartree atomic units;
+     Hz      : Hertz;
+     Kayser  : [cm**(-1)];
+ The physical speed of light in atomic units is   137.03598950000000      ;
+  revise this value ?
+ The default radial grid parameters for this case are:
+  rnt =   1.99999999999999991E-006 ;
+  h   =   5.00000000000000028E-002 ;
+  hp  =    0.0000000000000000      ;
+  n   =          390 ;
+  revise these values ?
+ Enter the name of the GRASP92 Radial WaveFunction File:
+  ... load complete;
+ Enter a file name for the  relci.mix  file:
+ Enter the serial number(s) of the level(s) to be calculated;
+  e.g. 1 3 4  7 - 20  48  69 - 85;
+ Storage initialization for the one- and two--partice effective interaction strengths complete.
+  
+ Block J^P = (1/2,+):  Trivial case of dimension 1.
+  
+ Number of Dirac-Coulomb one-electron integrals computed       =            4
+ Number of (full) one-electron matrix elements stored          =            4
+ Number of (full) one-electron matrix elements re-used         =            0
+  
+ Number of (full) two-electron X^k strengths computed          =           26
+ Number of (full) two-electron X^k strengths stored            =           26
+ Number of (full) two-electron X^k strengths re-used           =            0
+  
+ Average energy =   -96.723199303121476     
+
+ Eigenenergies:
+
+  Level  J Parity          Hartrees                    eV                    eV     
+
+    1     1/2   +   -9.672319930312148D+01   -2.631973297968802D+03   -2.631973297968802D+03
+
+
+ Weights of major contributors to ASF:
+
+  Level  J Parity      CSF contributions
+
+    1    1/2   +    1.00000 of    1
+  
+ RELCI Mixing Coefficient File generated.
+  
+ RELCI complete ... .

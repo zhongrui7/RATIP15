@@ -1,0 +1,154 @@
+rm: cannot remove `ne-1+-hole-cesd.sum': No such file or directory
+rm: cannot remove `ne-1+-hole.xpn': No such file or directory
+ CESD: Complete expansion of jj-coupled symmetry functions
+  into Slater determinants (Fortran 95 version)
+  (C) Copyright by S Fritzsche and others, CPC 124 (2000) 353.
+  
+ Enter a file name for the  cesd.sum  file:
+ Enter the name of the configuration symmetry list file:
+ Loading configuration symmetry list file ...
+  There are            4  relativistic subshells;
+  there are            1  relativistic CSFs;
+  ... load complete.
+ Expand the atomic state functions (ASF) ?
+ Print non-standard output on the cesd expansion ?
+ Select non-standard total M values for the  expansion into Slater determinants ? 
+  The standard is to use M = +J for each individual determinant.
+ Enter the name of the GRASP92 mixing 
+ Loading mixing coefficients file ...
+  ... load complete;
+ Enter a name for the CESD eXPaNsion  .xpn  output File that is to be created:
+ Allocate memory for            4  determinants.
+ Check orthogonality for ASF/CSF =            1
+  
+ CESD complete ... .
+rm: cannot remove `ne-1+-gs-cesd.sum': No such file or directory
+rm: cannot remove `ne-1+-gs.xpn': No such file or directory
+ CESD: Complete expansion of jj-coupled symmetry functions
+  into Slater determinants (Fortran 95 version)
+  (C) Copyright by S Fritzsche and others, CPC 124 (2000) 353.
+  
+ Enter a file name for the  cesd.sum  file:
+ Enter the name of the configuration symmetry list file:
+ Loading configuration symmetry list file ...
+  There are            4  relativistic subshells;
+  there are            3  relativistic CSFs;
+  ... load complete.
+ Expand the atomic state functions (ASF) ?
+ Print non-standard output on the cesd expansion ?
+ Select non-standard total M values for the  expansion into Slater determinants ? 
+  The standard is to use M = +J for each individual determinant.
+ Enter the name of the GRASP92 mixing 
+ Loading mixing coefficients file ...
+  ... load complete;
+ Enter a name for the CESD eXPaNsion  .xpn  output File that is to be created:
+ Allocate memory for           12  determinants.
+ Check orthogonality for ASF/CSF =            1
+ Check orthogonality for ASF/CSF =            2
+ Check orthogonality for ASF/CSF =            3
+  
+ CESD complete ... .
+rm: cannot remove `ratip_reos.sum': No such file or directory
+ REOS: Calculation of relaxed-orbital transitions probabilities
+  and lifetimes within a determinant basis (Fortran 95 version)
+  (C) Copyright by S Fritzsche and others, CPC 124 (2000) 340.
+  
+ Enter a file name for the  reos.sum  file:
+ Restart a previously aborted calculation ?
+ Enter the name of the isotope data file:
+ loading isotope data file ...
+  ... load complete;
+ Enter the transition multipoles, e.g.  E1 M2 ... :
+ Which units are to be used to enter and to print the energies of the continuum orbitals ?
+     A       : Angstrom;
+     eV      : electron volts;
+     Hartree : Hartree atomic units;
+     Hz      : Hertz;
+     Kayser  : [cm**(-1)];
+ Modify default set-up and printout of the program ?
+ Select individual transitions ?
+ Assume orthogonality between the orbital sets of the initial and final atomic states ?
+  This feature accelerates the computations but also  neglects all relaxation effects
+  on the transitions probabilities.
+ Calculate all radial integrals only once at the beginning of the computation ?
+  This feature accelerates the computations but requires considerable more memory, 
+  in particular, if many transitions need to be calculated.
+ Enable the restart of the calculation if the run cannot be completed successfully ?
+  This feature dumps all necessary information to a restart file from which the calculation can be continued. 
+ Sort transitions in ascending order of energy ?
+ Read in and apply experimental energies for the calculation of transition probabilities ?
+ Einstein A and B coefficients are printed in SI units;
+  use Hartree atomic units instead ?
+ Print all selected transitions and their energies before the computation starts (this is the default) ?
+ Write out the transition energies and amplitudes to an .trn file for further data processing,
+  for instance, to adopt them to experimental transition energies ?
+ Fix a cutoff criterium other than '10e-8' to neglect small
+  admixtures to the computation of transition probabilities ?
+ The physical speed of light in atomic units is   137.03598950000000      ;
+  revise this value ?
+ The default radial grid parameters for this case are:
+  rnt =   1.99999999999999991E-006 ;
+  h   =   5.00000000000000028E-002 ;
+  hp  =    0.0000000000000000      ;
+  n   =          390 ;
+  revise these values ?
+ Enter the name of the initial-state CESD .xpn expansion file
+ Enter the name of the final-state CESD .xpn expansion file
+ Enter the name of the final-state Radial WaveFunction File:
+  ... load complete;
+ Enter the name of the final-state Radial WaveFunction File:
+  ... load complete;
+ Initialize the set-up of the overlap integrals and transitions ...
+              3  transitions have been initialized and will be calculated in this run of the program.
+    set-up of 'symmetry blocks' for the initial-states complete;
+    set-up of 'symmetry blocks' for the final-states complete;
+    pre-calculation of      40 radial integrals complete;
+    ... initialization complete.
+  
+The following     3 transitions are selected:
+
+     I-level-F     I--J^P--F      Transition Energy       Multipoles 
+                                     (in   eV)  
+    ------------------------------------------------------------------
+       1 -   3    1/2+    1/2+      8.1999462E+02         M1
+       1 -   2    1/2+    1/2-      8.4957436E+02         E1
+       1 -   1    1/2+    3/2-      8.4966956E+02         E1
+    ------------------------------------------------------------------
+ Less than    9.0000000000000000       matrix elements between final- and initial-state determinants need to be calculated.
+  This includes zero contributions due to different M projections in the expansion of the wavefunctions.
+
+
+                                ===========================================================
+                                |  Summary of all Transition Probabilities and Lifetimes  |
+                                ===========================================================
+
+
+ --------------------------------------------------------------------------------------------------------------------------
+  LevI-LevF  I- J / Parity -F      Energy   Multipol   Gauge         Einstein coefficients       Oscillator    Decay width  
+                                                                       -1           3 -2 -1 
+                                   (  eV)                          A (s  )     gB (m s  J  )    strength GF       (eV) 
+
+ --------------------------------------------------------------------------------------------------------------------------
+    1 -  3    1/2 +     1/2 +    8.19995D+02   M1    Magnetic     3.46473D+05    1.43837D+11    2.37502D-08    2.28053D-10
+    1 -  2    1/2 +     1/2 -    8.49574D+02   E1    Babushkin    2.35976D+12    8.80841D+17    1.50691D-01    1.55322D-03
+    1 -  2    1/2 +     1/2 -    8.49574D+02   E1    Coulomb      2.13875D+12    7.98344D+17    1.36577D-01    1.40775D-03
+    1 -  1    1/2 +     3/2 -    8.49670D+02   E1    Babushkin    4.71922D+12    1.76098D+18    3.01294D-01    3.10625D-03
+    1 -  1    1/2 +     3/2 -    8.49670D+02   E1    Coulomb      4.25448D+12    1.58756D+18    2.71623D-01    2.80035D-03
+
+ --------------------------------------------------------------------------------------------------------------------------
+
+
+
+Radiative lifetimes, total rates, and widths:
+---------------------------------------------
+
+
+ LeveL      Gauge               Lifetime           Total rate                                Width
+ -----      -----               --------           ----------        -----------------------------------------------------
+                                Seconds              1/sec              Hartrees            Kaysers                eV
+
+    1      Babushkin:        1.4126319D-13       7.0789850D+12       1.0758853D-03       2.3612952D+02       2.9276340D-02
+           Coulomb:          1.5641531D-13       6.3932360D+12       9.7166309D-04       2.1325540D+02       2.6440309D-02
+
+  
+ REOS complete ... .
