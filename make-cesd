@@ -1,0 +1,69 @@
+#
+#  Define macros
+#
+OBJ = xcesd.o  rabs_angular.o  rabs_cesd.o  rabs_constant.o  rabs_csl.o    \
+      rabs_determinant.o  rabs_dirac_orbital.o  rabs_file_handling.o  \
+      rabs_functions_math.o  rabs_functions_string.o  rabs_grasp2k.o  \
+      rabs_naglib.o rabs_nucleus.o  rabs_print.o
+
+#
+#  Recompile xcesd
+#
+xcesd :   $(OBJ)
+	  $(FCP) $(OBJ) -O  -o xcesd $(LIB) $(LLP)
+
+xcesd.o :                 xcesd.f90  rabs_cesd.o  rabs_constant.o rabs_csl.o  \
+                          rabs_file_handling.o  rabs_print.o
+	$(FCP) $(FFL)     xcesd.f90
+
+rabs_angular.o :          rabs_angular.f90  rabs_constant.o \
+                          rabs_dirac_orbital.o  rabs_functions_math.o \
+			  rabs_naglib.o 
+	$(FCP) $(FFL)     rabs_angular.f90
+	
+rabs_cesd.o :             rabs_cesd.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_csl.o  rabs_determinant.o  rabs_dirac_orbital.o \
+			  rabs_file_handling.o 
+	$(FCP) $(FFL)     rabs_cesd.f90
+	
+rabs_constant.o :         rabs_constant.f90
+	$(FCP) $(FFL)     rabs_constant.f90
+	
+rabs_csl.o :              rabs_csl.f90  rabs_constant.o   rabs_determinant.o \
+                          rabs_dirac_orbital.o  rabs_functions_string.o 
+	$(FCP) $(FFL)     rabs_csl.f90
+	
+rabs_determinant.o :      rabs_determinant.f90  rabs_constant.o  \
+                          rabs_dirac_orbital.o  
+	$(FCP) $(FFL)     rabs_determinant.f90
+	
+rabs_dirac_orbital.o:     rabs_dirac_orbital.f90  rabs_constant.o \
+                          rabs_functions_math.o  rabs_naglib.o  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_dirac_orbital.f90
+	
+rabs_file_handling.o :    rabs_file_handling.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_grasp2k.o  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_file_handling.f90
+	
+rabs_functions_math.o :   rabs_functions_math.f90  rabs_constant.o \
+                          rabs_naglib.o
+	$(FCP) $(FFL)     rabs_functions_math.f90
+	
+rabs_functions_string.o : rabs_functions_string.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_functions_string.f90
+	
+rabs_grasp2k.o :          rabs_grasp2k.f90  rabs_constant.o \
+                          rabs_dirac_orbital.o  rabs_functions_math.o \
+			  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_grasp2k.f90
+	
+rabs_naglib.o :           rabs_naglib.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_naglib.f90
+	
+rabs_nucleus.o :          rabs_nucleus.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_nucleus.f90
+
+rabs_print.o :            rabs_print.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_functions_string.o  rabs_grasp2k.o 
+	$(FCP) $(FFL)     rabs_print.f90
+	

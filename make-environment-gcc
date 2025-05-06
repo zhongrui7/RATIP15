@@ -1,0 +1,14 @@
+#
+# Define the following global variables according to your environment and
+# source the script or add these definitions to your .cshrc file and 
+# source ~/.cshrc
+
+#
+# For ubuntu Linux, gcc
+# ---------------------
+export    FCP=gfortran
+export    FCQ=gfortran
+export    FFL="-c -O3"
+export    LIB="-ldvdson -llapackd -llapacku -lblas"
+export    LLP="-L./lib"
+

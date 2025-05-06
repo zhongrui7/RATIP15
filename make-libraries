@@ -1,0 +1,59 @@
+#
+# This file must be 'sourced' under LINUX
+#
+
+#!/bin/sh 
+                                                                                                                                            
+cd ./lib
+#  rm *.a
+cd ..
+
+
+#
+# Recompile and ran lib-blas
+#
+echo 'generate blas library ...'
+cd lib-blas/src
+   rm *.o
+   $FCQ -c *.f
+   ar r blas.a *.o 
+   ranlib blas.a
+   mv blas.a ../../lib/libblas.a
+cd ../..
+echo ' ... done'
+
+#
+# Recompile and ran lib-dvdson
+#
+echo 'generate dvdson library ...'
+cd lib-dvdson/src
+   rm *.o
+   $FCQ -c *.f
+   ar r dvdson.a *.o  
+   ranlib dvdson.a
+   mv dvdson.a ../../lib/libdvdson.a
+cd ../..
+echo ' ... done'
+
+#
+# Recompile and ran lib-lapack
+#
+echo 'generate lapack library ...'
+cd lib-lapack/src/
+   cd double
+      rm *.o
+      $FCQ -c *.f
+      ar r lapackd.a *.o  
+      ranlib lapackd.a
+      mv lapackd.a ../../../lib/liblapackd.a
+   cd ../util
+      rm *.o
+      $FCQ -c *.f
+      ar r lapacku.a *.o  
+      ranlib lapacku.a
+      mv lapacku.a ../../../lib/liblapacku.a
+   cd ..
+cd ../..
+echo ' ... done'
+
+ 

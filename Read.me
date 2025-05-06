@@ -1,0 +1,85 @@
+
+
+Last modified: 05. Feb 2012
+---------------------------
+
+After you have unpacked the ratip-2012 root directory, the following steps will help install the 
+RATIP code for later use:
+
+(1)  Modify the file make-environment-gcc according to your local installation;
+     
+     source make-environment-gcc     
+                 
+     
+(2)  Run the following script and makefiles:
+
+     make-libraries
+     make -f make-auger  
+     make -f make-cesd     
+     make -f make-einstein 
+     make -f make-photo    
+     make -f make-rec      
+     make -f make-relci    
+     make -f make-reos     
+     make -f make-toolbox  
+     
+(3)  If the installation was successful, the following executables are available in the ratip-2011
+     root directory:
+     
+     xauger, xcesd, xeinstein, xphoto, xrec, xrelci, xreos, xtoolbox
+    
+
+
+The installation of the code has been tested recently by using the compilers
+
+++ gfortran-4.2  (version 4.2, ubundu)
+++ gfortran-4.6  (version 4.6, ubundu)
+
+
+
+
+
+
+For other compilers, one has likely to take care to set the proper flags for
+the compilation and liking of the program. The following flags have been
+utilized in the past, although some of them already five or more years ago.
+
+#
+# Define the following global variables according to your environment and
+# source the script or add these definitions to your .cshrc file and 
+# source ~/.cshrc
+
+#
+# For Suse Linux, pgf90
+# ---------------------
+export    FCP=pgf90
+export    FCQ=pgf90
+export    FFL="-c  -tp=k8-64 -O2 -Mbounds -Bdynamic -mcmodel=medium -Mlfs -Msmart"
+# export    FFL="-c  -tp=k8-64 -g -Mbounds -Bdynamic -mcmodel=medium -Mlfs -Msmart -Mscalarsse-O0"
+export    LIB="-ldvdson -llapackd -llapacku -lblas -lnag"
+export    LLP="-L./lib  -L/usr/lib64/gcc/x86_64-suse-linux/4.1.2"
+
+#
+# For Suse Linux, lf95
+# --------------------
+# export    FCP=lf95
+# export    FCQ=lf95
+# export    FFL="-O0 -tpp -c"
+# export    LIB="-ldvdson -llapackd -llapacku -lblas -lnag"
+# export    LLP="-L./lib"
+
+#
+# For Linux, nagf95
+# -----------------
+# export    FCP=nagf95
+# export    FFL="-O -c -free -ieee=full -gline -C=all"
+# export    LIB="-lc -lfri -lnjgraf -lf2c -ldvdson -llapackd -llapacku -lblas"
+# export    LLP="-L../nlb -L./lib"
+
+#
+# For IBM RS/6000
+# ---------------
+# export    FCP=f90
+# export    FFL="-O -c -free -gline -C=all"
+# export    LIB="-lc -lfri -lnjgraf -lf2c -ldvdson -llapackd -llapacku -lblas"
+# export    LLP="-L../nlb -L./lib"

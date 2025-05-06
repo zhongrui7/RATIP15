@@ -1,0 +1,162 @@
+#
+#  Define macros
+#
+OBJ = xtoolbox.o  rabs_anco.o rabs_angular.o  rabs_cesd.o  rabs_constant.o  \
+      rabs_csl.o  rabs_determinant.o rabs_dirac_orbital.o  \
+      rabs_dvdson.o  rabs_file_handling.o  rabs_functions_math.o  \
+      rabs_functions_string.o  rabs_grasp2k.o  rabs_hamiltonian.o  \
+      rabs_input_dialog.o  rabs_lsj.o  rabs_lsj_data.o  \
+      rabs_multipole.o  rabs_naglib.o  rabs_nucleus.o    \
+      rabs_print.o  rabs_rcfp.o  rabs_recoupling.o  rabs_relci.o  \
+      rabs_toolbox_ac.o  rabs_toolbox_aux.o   rabs_toolbox_df.o  \
+      rabs_toolbox_gk.o  rabs_toolbox_ln.o  rabs_toolbox_mess.o  \
+      rabs_toolbox_or.o  rabs_toolbox_sz.o  rabs_toolbox_tpdi.o  rabs_xl.o
+        
+
+#
+#  Recompile xutility
+#
+xtoolbox:   $(OBJ) 
+	    $(FCP) $(OBJ) -O  -o ./xtoolbox  $(LIB) $(LLP)
+
+xtoolbox.o :              xtoolbox.f90  rabs_constant.o  rabs_grasp2k.o  \
+                          rabs_lsj.o  rabs_naglib.o \
+                          rabs_toolbox_ac.o  rabs_toolbox_aux.o   \
+			  rabs_toolbox_df.o  rabs_toolbox_gk.o    \
+			  rabs_toolbox_ln.o  rabs_toolbox_mess.o  \
+                          rabs_toolbox_or.o  rabs_toolbox_sz.o    \
+			  rabs_toolbox_tpdi.o 
+	$(FCP) $(FFL)     xtoolbox.f90
+
+rabs_anco.o :             rabs_anco.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_csl.o  rabs_file_handling.o  rabs_naglib.o  \
+			  rabs_rcfp.o  rabs_recoupling.o
+	$(FCP) $(FFL)     rabs_anco.f90
+	
+rabs_angular.o :          rabs_angular.f90  rabs_constant.o \
+                          rabs_dirac_orbital.o  rabs_functions_math.o \
+			  rabs_naglib.o 
+	$(FCP) $(FFL)     rabs_angular.f90
+	
+rabs_cesd.o :             rabs_cesd.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_determinant.o  rabs_dirac_orbital.o
+	$(FCP) $(FFL)     rabs_cesd.f90
+	
+rabs_constant.o :         rabs_constant.f90
+	$(FCP) $(FFL)     rabs_constant.f90
+	
+rabs_csl.o :              rabs_csl.f90  rabs_constant.o   rabs_determinant.o \
+                          rabs_dirac_orbital.o  rabs_functions_string.o 
+	$(FCP) $(FFL)     rabs_csl.f90
+	
+rabs_determinant.o :      rabs_determinant.f90  rabs_constant.o  \
+                          rabs_dirac_orbital.o  
+	$(FCP) $(FFL)     rabs_determinant.f90
+	
+rabs_dirac_orbital.o:     rabs_dirac_orbital.f90  rabs_constant.o \
+                          rabs_functions_math.o  rabs_naglib.o  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_dirac_orbital.f90
+	
+rabs_dvdson.o :           rabs_dvdson.f90  rabs_constant.o  rabs_hamiltonian.o
+	$(FCP) $(FFL)     rabs_dvdson.f90
+	
+rabs_file_handling.o :    rabs_file_handling.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_grasp2k.o  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_file_handling.f90
+	
+rabs_functions_math.o :   rabs_functions_math.f90  rabs_constant.o \
+                          rabs_naglib.o
+	$(FCP) $(FFL)     rabs_functions_math.f90
+	
+rabs_functions_string.o : rabs_functions_string.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_functions_string.f90
+	
+rabs_grasp2k.o :          rabs_grasp2k.f90  rabs_constant.o \
+                          rabs_dirac_orbital.o  rabs_functions_math.o \
+			  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_grasp2k.f90
+	
+rabs_hamiltonian.o :      rabs_hamiltonian.f90  rabs_anco.o  rabs_constant.o \
+                          rabs_csl.o  rabs_grasp2k.o  rabs_xl.o
+	$(FCP) $(FFL)     rabs_hamiltonian.f90
+	
+rabs_input_dialog.o :     rabs_input_dialog.f90  rabs_constant.o  \
+                          rabs_functions_string.o  rabs_nucleus.o 
+	$(FCP) $(FFL)     rabs_input_dialog.f90
+	
+rabs_lsj.o :              rabs_lsj.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_csl.o  rabs_file_handling.o  rabs_lsj_data.o
+	$(FCP) $(FFL)     rabs_lsj.f90
+	
+rabs_lsj_data.o :         rabs_lsj_data.f90  rabs_angular.o  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_lsj_data.f90
+	
+rabs_multipole.o :        rabs_multipole.f90  rabs_constant.o  rabs_angular.o \
+                          rabs_grasp2k.o  rabs_nucleus.o
+	$(FCP) $(FFL)     rabs_multipole.f90
+
+rabs_naglib.o :           rabs_naglib.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_naglib.f90
+	
+rabs_nucleus.o :          rabs_nucleus.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_nucleus.f90
+
+rabs_print.o :            rabs_print.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_functions_string.o  rabs_grasp2k.o 
+	$(FCP) $(FFL)     rabs_print.f90
+	
+rabs_rcfp.o :             rabs_rcfp.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_functions_string.o
+	$(FCP) $(FFL)     rabs_rcfp.f90
+	
+rabs_recoupling.o :       rabs_recoupling.f90  rabs_angular.o  rabs_constant.o \
+                          rabs_csl.o  rabs_rcfp.o
+	$(FCP) $(FFL)     rabs_recoupling.f90
+	
+rabs_relci.o :            rabs_relci.f90  rabs_anco.o  rabs_constant.o \
+                          rabs_dvdson.o  rabs_file_handling.o  \
+			  rabs_hamiltonian.o
+	$(FCP) $(FFL)     rabs_relci.f90
+	
+rabs_toolbox_ac.o :       rabs_toolbox_ac.f90  rabs_anco.o  rabs_constant.o  \
+                          rabs_csl.o  rabs_file_handling.o  rabs_print.o \
+			  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_ac.f90
+	
+rabs_toolbox_aux.o :      rabs_toolbox_aux.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_grasp2k.o  rabs_multipole.o
+	$(FCP) $(FFL)     rabs_toolbox_aux.f90
+	
+rabs_toolbox_df.o :       rabs_toolbox_df.f90  rabs_anco.o  rabs_constant.o  \
+                          rabs_csl.o  rabs_file_handling.o  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_df.f90
+	
+rabs_toolbox_gk.o :       rabs_toolbox_gk.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_file_handling.o  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_gk.f90
+	
+rabs_toolbox_mess.o :     rabs_toolbox_mess.f90  rabs_constant.o 
+	$(FCP) $(FFL)     rabs_toolbox_mess.f90
+	
+rabs_toolbox_ln.o :       rabs_toolbox_ln.f90  rabs_cesd.o  rabs_constant.o  \
+                          rabs_csl.o  rabs_file_handling.o  rabs_multipole.o  \
+			  rabs_print.o  rabs_toolbox_aux.o  rabs_xl.o
+	$(FCP) $(FFL)     rabs_toolbox_ln.f90
+	
+rabs_toolbox_or.o :       rabs_toolbox_or.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_file_handling.o  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_or.f90
+	
+rabs_toolbox_sz.o :       rabs_toolbox_sz.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_file_handling.o  rabs_hamiltonian.o  \
+			  rabs_relci.o  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_sz.f90
+	
+rabs_toolbox_tpdi.o :     rabs_toolbox_tpdi.f90  rabs_constant.o  rabs_csl.o \
+                          rabs_file_handling.o  rabs_toolbox_aux.o
+	$(FCP) $(FFL)     rabs_toolbox_tpdi.f90
+	
+rabs_xl.o :               rabs_xl.f90  rabs_angular.o  rabs_constant.o   \
+                          rabs_grasp2k.o  rabs_naglib.o  rabs_nucleus.o 
+	$(FCP) $(FFL)     rabs_xl.f90
+
