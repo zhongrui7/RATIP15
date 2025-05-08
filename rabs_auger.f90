@@ -28,6 +28,7 @@ module rabs_auger
    use rabs_nonorthonormal
    use rabs_print
    use rabs_xl
+   use omp_lib
    implicit none
    !
    private :: auger_angular_parameter
