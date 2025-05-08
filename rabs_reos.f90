@@ -18,6 +18,7 @@ module rabs_reos
    use rabs_grasp2k
    use rabs_input_dialog
    use rabs_nucleus
+   use omp_lib
    implicit none
    !
    public  :: reos_test_initial
