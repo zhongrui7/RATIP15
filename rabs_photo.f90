@@ -171,7 +171,7 @@ module rabs_photo
    !
    ! Energy unit for the output of all energies
    real(kind=dp)    :: photo_cs_factor = zero, &
-                       photo_print_cut = 0.001_dp, &
+                       photo_print_cut = 0.00001_dp, &
                        photo_energy_shift  = zero, photo_maximal_energy
    character(len=7) :: photo_cs_unit
    !
