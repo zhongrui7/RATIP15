@@ -4,8 +4,8 @@ module rabs_auger
 !-----------------------------------------------------------------------
 ! This module contains the procedures which are specific to the AUGER
 ! program. This program supports the calculation of nonradiative rates,
-! relative intensities, and angular distribution parameters.
-! The continuum orbitals which are required for these computations are
+! relative intensities, and angular distribution parameters. 
+! The continuum orbitals which are required for these computations are 
 ! generated automatically by a call to the COWF component.
 ! At the present, the program supports nonorthogonality between the
 ! orbitals only via the form of the radial functions. In the evaluation
@@ -14,7 +14,7 @@ module rabs_auger
 ! ANCO for calculating the angular integrals for one- and two-particle
 ! matrix elements.
 ! In this module below, there are several procedures also for the file
-! handling and the intermediate storage to accelerate some of the
+! handling and the intermediate storage to accelerate some of the 
 ! computations.
 !-----------------------------------------------------------------------
    !
@@ -41,7 +41,7 @@ module rabs_auger
                  ! Calculates the generalized coefficient B_bar_k1,k,k0 ()
                  ! due to Kabachnik (1994).
    public  :: auger_calculate_amplitudes
-                 ! Calculates for all selected transitions (in turn) the
+                 ! Calculates for all selected transitions (in turn) the 
                  ! required continuum spinors and Auger amplitudes.
    private :: auger_channel_amplitude
                  ! Calculates the Auger amplitude of a channel from the 'pure'
@@ -56,7 +56,7 @@ module rabs_auger
                  ! Set up the selected transitions and initializes some
 		 ! arrays as required.
    !!x public  :: auger_initialize_rwf_storage
-   !!x               ! Initializes the arrays of type(grasp2k_orbital) for the
+   !!x               ! Initializes the arrays of type(grasp2k_orbital) for the 
    !!x               ! storage of the radial wave functions.
    public  :: auger_print_results
                  ! Writes the transition rates, lifetimes, and others to
@@ -72,9 +72,9 @@ module rabs_auger
 		 ! configuration scheme.
    private :: auger_rho_after_dipole
    private :: auger_rho_density
-   private :: auger_rho_dipole_excitation
-                 ! Calculates the density matrix of the coherently-excited
-                 ! initial states of an Auger cascade by linearly polarized
+   private :: auger_rho_dipole_excitation          
+                 ! Calculates the density matrix of the coherently-excited 
+                 ! initial states of an Auger cascade by linearly polarized 
                  ! light along the z-axis.
    private :: auger_set_overlaps
                  ! Initializes the array of overlap integrals for the
@@ -87,7 +87,7 @@ module rabs_auger
                  ! Returns the eta_k spin polarization coefficient for a
 		 ! given transition.
    private :: auger_transition_properties
-                 ! Calculates all selected Auger properties of transition i
+                 ! Calculates all selected Auger properties of transition i 
 		 ! from the amplitudes of the individual channels.
    private :: auger_width
                  ! Returns the width of a given 'initial' level.
@@ -96,16 +96,16 @@ module rabs_auger
    ! read in during the interactive control and may overwrite existing
    ! default values
    !
-   ! Define a 'configuration scheme' to be built up during execution
+   ! Define a 'configuration scheme' to be built up during execution 
    type(grasp2k_orbital), public :: wave_continuum
    type(orbital_function)        :: auger_csp
    !
    ! Define an internal structure type(auger_transition) which stores all
    ! necessary information for an radiative transition line
    type :: auger_channel
-      integer          :: kappa
-      real(kind=dp)    :: phase, amplitude_re
-      complex(kind=dp) :: amplitude
+      integer          :: kappa   
+      real(kind=dp)    :: phase, amplitude_re 
+      complex(kind=dp) :: amplitude   
    end type auger_channel
    !
    type :: auger_transition
@@ -121,9 +121,9 @@ module rabs_auger
    type(auger_transition), dimension(:), allocatable :: transition
    !
    type :: auger_matrix
-      integer :: no_f, no_i
-      integer, dimension(:), pointer :: ndx_f, ndx_i
-      real(kind=dp), dimension(:,:), pointer :: matrix
+      integer :: no_f, no_i  
+      integer, dimension(:), pointer :: ndx_f, ndx_i  
+      real(kind=dp), dimension(:,:), pointer :: matrix   
    end type auger_matrix
    !
    type(auger_matrix) :: auger
@@ -131,12 +131,12 @@ module rabs_auger
    integer          :: number_of_transitions                 = 0
    integer, public  :: auger_maximal_kappa                   = 20
    !
-   integer, private                            :: number_radial_integrals
+   integer, private                            :: number_radial_integrals       
    real(kind=dp),     dimension(1:500), private :: radial_value
    character(len=25), dimension(1:500), private :: radial_string
    !
    ! Define global logical flags for the control of the AUGER program; the
-   ! default values for these flags may be overwritten interactively during
+   ! default values for these flags may be overwritten interactively during 
    ! input time
    logical, public :: auger_add_1                     = .false.,  &
                       auger_add_2                     = .false.,  &
@@ -172,7 +172,7 @@ module rabs_auger
                        auger_lowest_transition    = zero
    character(len=7) :: auger_rate_unit
    !
-   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i)
+   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i) 
    real(kind=dp), dimension(:,:,:), allocatable :: auger_overlap
    !
 contains
@@ -180,15 +180,15 @@ contains
    function auger_angular_parameter(k,trans)               result(alpha)
    !--------------------------------------------------------------------
    ! Returns the alpha_k angular distribution parameter for the transition
-   ! trans. It uses the explicit expression in terms of the partial wave
-   ! transition amplitudes as given by J Tulkki, H Aksela, and
+   ! trans. It uses the explicit expression in terms of the partial wave 
+   ! transition amplitudes as given by J Tulkki, H Aksela, and 
    ! N M Kabachnik, Phys. Rev. A 48, 1277 (1993), Eqs. A26-27.
    !
    ! Calls: angular_momentum_j(), angular_momentum_l().
    !--------------------------------------------------------------------
       !
       integer, intent(in)    :: k
-      type(auger_transition) :: trans
+      type(auger_transition) :: trans 
       real(kind=dp)          :: alpha
       !
       integer          :: iphase, ja, jb, la, lb, ma, mb
@@ -209,6 +209,8 @@ contains
       ! Now cycle about the different Auger amplitudes including proper
       ! phase factors and the products of partial-wave expansion coefficients;
       ! Here, b denotes the prime quantum numbers in eq. A27.
+      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(ma, mb, ja, jb, la, lb, wa, iphase) &
+      !$OMP&            REDUCTION(+:sum) COLLAPSE(2)
       do  ma = 1,trans%number_of_channels
          do  mb = 1,trans%number_of_channels
 	    ja = angular_momentum_j(trans%channel(ma)%kappa)
@@ -218,7 +220,7 @@ contains
 	    !
 	    wa = (la+la+one)*(lb+lb+one)*(ja+one)*(jb+one)*(trans%totalJ_i+one)
 	    wa = sqrt(wa)
-	    wa = wa * Clebsch_Gordan(la+la,0,lb+lb,0,k+k,0)
+	    wa = wa * Clebsch_Gordan(la+la,0,lb+lb,0,k+k,0) 
 	    wa = wa * wigner_6j_symbol(trans%totalJ_i,trans%totalJ_i,         &
 	                               k+k,ja,jb,trans%totalJ_f)              &
 	            * wigner_6j_symbol(ja,jb,k+k,lb+lb,la+la,1)               &
@@ -227,6 +229,7 @@ contains
             !!x print *, "sum, norm = ",sum, norm, sum/norm
 	 end do
       end do
+      !$OMP END PARALLEL DO
       !
       alpha = sum / norm
       !
@@ -236,15 +239,15 @@ contains
    function auger_angular_parameter_old(k,trans)               result(alpha)
    !--------------------------------------------------------------------
    ! Returns the alpha_k angular distribution parameter for the transition
-   ! trans. It uses the explicit expression in terms of the partial wave
-   ! transition amplitudes as given by J Tulkki, H Aksela, and
+   ! trans. It uses the explicit expression in terms of the partial wave 
+   ! transition amplitudes as given by J Tulkki, H Aksela, and 
    ! N M Kabachnik, Phys. Rev. A 48, 1277 (1993), Eqs. A26-27.
    !
    ! Calls: angular_momentum_j(), angular_momentum_l().
    !--------------------------------------------------------------------
       !
       integer, intent(in)    :: k
-      type(auger_transition) :: trans
+      type(auger_transition) :: trans 
       real(kind=dp)          :: alpha
       !
       integer       :: iphase, ja, jb, la, lb, ma, mb
@@ -286,7 +289,7 @@ contains
 		    * cos(trans%channel(ma)%phase - trans%channel(mb)%phase)  &
 		    * trans%channel(ma)%amplitude * trans%channel(mb)%amplitude
 	    !
-	    wa = wa * wigner_3j_symbol(lb+lb,la+la,k+k,0,0,0)
+	    wa = wa * wigner_3j_symbol(lb+lb,la+la,k+k,0,0,0) 
 	    !
 	    sum = sum + wa
             !!x print *, "sum, norm = ",sum, norm, sum/norm
@@ -299,15 +302,15 @@ contains
    !
    !
    function auger_anisotropy_Ak_kabachnik(k,J1_level,J1p_level,J2_level) &
-                                                                result(Ak)
+                                                                result(Ak) 
    !--------------------------------------------------------------------
    ! Calculates the density matrix of the intermediate states from the
    ! statistical tensor of the initial (resonant) state and the amplitudes
    ! of the first-step Auger decay [cf. Ueda et al., JPB (1999), Eq. (6)].
    ! The dummy parameter J1_level, ... refer to the level numbers of the
    ! corresponding transition array
-   !
-   ! Calls: angular_momentum_j(), angular_momentum_l(),
+   ! 
+   ! Calls: angular_momentum_j(), angular_momentum_l(), 
    !        auger_return_amplitude().
    !--------------------------------------------------------------------
       !
@@ -316,7 +319,7 @@ contains
       integer          :: i, j, jp, J1, J1p, J2, kappa, kappa_p, l , lp
       complex(kind=dp) :: Ak, wa
       !
-      Ak = cmplx(zero,zero)
+      Ak = cmplx(zero,zero) 
       !
       ! Determine the total angular momenta of the initial and final states
       J1 = -99;   J1p = -99;   J2 = -99
@@ -346,9 +349,9 @@ contains
          do  kappa_p = -12,12
             if (kappa_p == 0) cycle
             jp  = angular_momentum_j(kappa_p)
-            lp  = angular_momentum_l(kappa_p)
+            lp  = angular_momentum_l(kappa_p)	
             wa  = sqrt( (l+l+one)*(lp+lp+one)*(j+one)*(jp+one)          * &
-                               (J1+one)*(J1p+one) )
+                               (J1+one)*(J1p+one) )    
             wa  = wa * Clebsch_Gordan(l+l,0,lp+lp,0,k+k,0)              * &
                   wigner_6j_symbol(l+l,j,1,jp,lp+lp,k+k)                * &
                   wigner_6j_symbol(J1,j,J2,jp,J1p,k+k)                  * &
@@ -359,7 +362,7 @@ contains
       end do
       !
       ! Add phase information
-      if (mod(J1+J2-1+32,4) == 0) then
+      if (mod(J1+J2-1+32,4) == 0) then         
       else if (mod(J1+J2-1+32,4) == 2) then
          Ak = -Ak
       else if (rabs_use_stop) then
@@ -370,13 +373,13 @@ contains
    !
    !
    function auger_anisotropy_Bbar_kabachnik(k1,k,k0,J0_level,J1_level, &
-                                            J1p_level)         result(Bbar)
+                                            J1p_level)         result(Bbar) 
    !--------------------------------------------------------------------
    ! Calculates the generalized coefficient Bar{B}_k1,k,k0 (J0,J1,J1').
    ! The dummy parameters J0_level, ... refer to the level numbers of the
    ! corresponding transition array
-   !
-   ! Calls: angular_momentum_j(), angular_momentum_l(),
+   ! 
+   ! Calls: angular_momentum_j(), angular_momentum_l(), 
    !        auger_return_amplitude().
    !--------------------------------------------------------------------
       !
@@ -385,7 +388,7 @@ contains
       integer          :: i, j, jp, J0, J1, J1p, kappa, kappa_p, l , lp
       complex(kind=dp) :: Bbar, wa
       !
-      Bbar = cmplx(zero,zero)
+      Bbar = cmplx(zero,zero) 
       !
       ! Determine the total angular momenta of the initial and final states
       J0 = -99;   J1 = -99;   J1p = -99
@@ -416,7 +419,7 @@ contains
             if (kappa_p == 0) cycle
             jp  = angular_momentum_j(kappa_p)
             lp  = angular_momentum_l(kappa_p)
-            wa  = sqrt( (l+l+one)*(lp+lp+one)*(j+one)*(jp+one) )
+            wa  = sqrt( (l+l+one)*(lp+lp+one)*(j+one)*(jp+one) )    
             wa  = wa * Clebsch_Gordan(l+l,0,lp+lp,0,k1+k1,0)            * &
                   wigner_6j_symbol(l+l,j,1,jp,lp+lp,k1)                 * &
                   wigner_9j_symbol(J1,j,J0,J1p,jp,J0,k+k,k1+k1,k0+k0)   * &
@@ -438,134 +441,121 @@ contains
    subroutine auger_calculate_amplitudes()
    !--------------------------------------------------------------------
    ! Calculates for all transitions in turn the required continuum
-   ! spinors and Auger amplitudes.
-   !
-   ! Calls: add_csf_to_basis(), anco_calculate_csf_matrix(),
-   ! auger_channel_amplitude(), auger_pure_matrix(),
+   ! spinors and Auger amplitudes. 
+   ! 
+   ! Calls: add_csf_to_basis(), anco_calculate_csf_matrix(), 
+   ! auger_channel_amplitude(), auger_pure_matrix(), 
    ! auger_transition_properties() cowf_iterate_csp(),
    ! cowf_set_xk_coefficients(), cowf_set_yk_coefficients(),
    ! print_configuration_scheme()
    ! set_configuration_scheme().
    !--------------------------------------------------------------------
+      !
       integer       :: i, j, n, nw, nocsf
       real(kind=dp) :: energy
       type(nkappa)  :: subshell
       integer, dimension(:), allocatable :: ndx
-
-      ! Variables that need to be private to each thread
-      integer, dimension(:), allocatable :: local_ndx_f, local_ndx_i
-      real(kind=dp), dimension(:,:), allocatable :: local_matrix
-
-      n = asf_final%csf_set%nocsf + asf_initial%csf_set%nocsf
-
-      ! Allocate global arrays outside parallel region
+      !
+      n = asf_final%csf_set%nocsf + asf_initial%csf_set%nocsf 
+      !
+      ! Allocate for a "first time"; it is first dellocated before any usage
       allocate( auger_csp%P(1:n_grasp2k), auger_csp%Q(1:n_grasp2k) )
       allocate( cowf_csp%P(1:10), cowf_csp%Q(1:10) )
       allocate( ndx(1:n) )
-
-      ! Parallelize the main loop over transitions
-      !$OMP PARALLEL PRIVATE(i, j, energy, subshell, local_ndx_f, local_ndx_i, &
-      !$OMP                  local_matrix, nw, nocsf) SHARED(ndx)
-      !$OMP DO SCHEDULE(DYNAMIC)
+      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(i, j, n, nw, nocsf, energy, subshell, ndx) &
+      !$OMP&            SCHEDULE(DYNAMIC)
       do  i = 1,number_of_transitions
          if (transition(i)%energy < zero) then
-            !$OMP CRITICAL
             transition(i)%probability = zero
             transition(i)%alpha_2     = zero
             transition(i)%alpha_4     = zero
             transition(i)%eta_2       = zero
             transition(i)%eta_4       = zero
-            !$OMP END CRITICAL
             cycle
          end if
-
+         !
          do  j = 1,transition(i)%number_of_channels
-            energy = transition(i)%energy
+	    energy = transition(i)%energy
+            !!x print *, "auger_calculate_amplitudes - a"
             call set_configuration_scheme(asf_final%csf_set,asf_cont%csf_set,&
                      -1,transition(i)%channel(j)%kappa,                      &
-                     transition(i)%totalJ_f,transition(i)%parity_f,          &
-                     transition(i)%totalJ_i,transition(i)%parity_i,          &
+	             transition(i)%totalJ_f,transition(i)%parity_f,          &
+	             transition(i)%totalJ_i,transition(i)%parity_i,          &
                      append=.false.,index=ndx)
-
-            ! Allocate thread-private arrays
-            auger%no_f = asf_cont%csf_set%nocsf
-            allocate( local_ndx_f(auger%no_f) )
-            local_ndx_f(1:auger%no_f) = ndx(1:auger%no_f)
-
+	    !
+	    auger%no_f = asf_cont%csf_set%nocsf
+	    allocate( auger%ndx_f(auger%no_f) )
+	    auger%ndx_f(1:auger%no_f) = ndx(1:auger%no_f)
+	    !
             nw = asf_cont%csf_set%nwshells
             if (rabs_use_stop  .and. nw /= asf_final%csf_set%nwshells + 1) then
                stop "auger_calculate_amplitudes(): program stop A."
             end if
-
-            nocsf = asf_cont%csf_set%nocsf
+            ! Calculate the MCP coefficients for the current coupling scheme
+            ! as well as the d_rs,  y_k(ab), and x_k(abcd) coefficients
+	    nocsf = asf_cont%csf_set%nocsf
             call anco_calculate_csf_matrix(asf_cont%csf_set,1,nocsf,1,nocsf)
             call cowf_set_drs_coefficients(transition(i)%asff,             &
                                            asf_cont%csf_set,ndx)
-            subshell = nkappa(-1,transition(i)%channel(j)%kappa)
+	    subshell = nkappa(-1,transition(i)%channel(j)%kappa)
             call cowf_set_yk_coefficients(subshell,asf_cont%csf_set)
+            !!x print *, "auger_calculate_amplitudes - f"
             call cowf_set_xk_coefficients(subshell,asf_cont%csf_set)
-
-            ! Set continuum orbital calculation parameters
+            !!x print *, "auger_calculate_amplitudes - g"
+            !
+            ! Now iterate the continuum spinors for this channel
+            ! cowf_solve_homogeneous_eqn     = .true.
             cowf_start_homogeneous         = .true.
             cowf_phaseshift_wkb            = .true.
             cowf_phaseshift_zero_potential = .false.
             cowf_phaseshift_coulomb        = .false.
-            cowf_norm_wkb                  = .true.
+	    !
+	    !! cowf_norm_nonrel               = .true.
+	    cowf_norm_wkb                  = .true.
             call cowf_iterate_csp(energy,subshell)
-
-            !$OMP CRITICAL
-            auger_csp = cowf_csp
+            !
+            auger_csp = cowf_csp 
             transition(i)%channel(j)%phase = auger_csp%phase
-            !$OMP END CRITICAL
-
-            ! Define extended configuration scheme
-            call add_csf_to_basis(asf_initial%csf_set,asf_cont%csf_set,      &
-                    transition(i)%totalJ_i,transition(i)%parity_i,index=ndx)
+            !
+	    ! Define the 'extended' configuration scheme for calculating
+	    ! the Auger matrix and allocate memory
+	    call add_csf_to_basis(asf_initial%csf_set,asf_cont%csf_set,      &
+	             transition(i)%totalJ_i,transition(i)%parity_i,index=ndx)
             if (auger_print_csf_scheme) then
                call print_configuration_scheme(6,asf_cont%csf_set)
             end if
-
-            auger%no_i = asf_cont%csf_set%nocsf - auger%no_f
-            allocate( local_ndx_i(auger%no_i) )
-            local_ndx_i(1:auger%no_i) = ndx(1+auger%no_f:asf_cont%csf_set%nocsf)
-            allocate( local_matrix(1:auger%no_f,1:auger%no_i) )
-
-            ! Calculate Auger matrix
-            call auger_pure_matrix(asf_cont%csf_set,i)
-
-            ! Move matrix results to shared storage with critical section
-            !$OMP CRITICAL
-            allocate( auger%ndx_f(auger%no_f) )
-            allocate( auger%ndx_i(auger%no_i) )
-            allocate( auger%matrix(1:auger%no_f,1:auger%no_i) )
-            auger%ndx_f = local_ndx_f
-            auger%ndx_i = local_ndx_i
-            auger%matrix = local_matrix
-            call auger_channel_amplitude(i,j)
-            deallocate( auger%ndx_f, auger%ndx_i, auger%matrix )
-            !$OMP END CRITICAL
-
-            deallocate( local_ndx_f, local_ndx_i, local_matrix )
+	    !
+	    auger%no_i = asf_cont%csf_set%nocsf - auger%no_f
+	    allocate( auger%ndx_i(auger%no_i) )
+	    auger%ndx_i(1:auger%no_i) = ndx(1+auger%no_f:asf_cont%csf_set%nocsf)
+	    allocate( auger%matrix(1:auger%no_f,1:auger%no_i) )
+	    !
+	    ! Calculate the 'pure' Auger matrix in the given CSF scheme
+            ! (not including mixing coefficients)
+	    call auger_pure_matrix(asf_cont%csf_set,i)
+	    !
+	    call auger_channel_amplitude(i,j)
+            !
+	    deallocate( auger%ndx_f, auger%ndx_i, auger%matrix  )
             call deallocate_csf_basis(asf_cont%csf_set)
-         end do
-
-         ! Calculate transition properties
+	 end do
+	 !
+	 ! Calculates all selected properties for the selected transition
          call auger_transition_properties(transition(i))
       end do
-      !$OMP END DO
-      !$OMP END PARALLEL
-
+      !$OMP END PARALLEL DO
       deallocate( ndx, auger_csp%P, auger_csp%Q)
+      !
    end subroutine auger_calculate_amplitudes
    !
    !
    subroutine auger_channel_amplitude(i,j)
    !--------------------------------------------------------------------
-   ! Calculates the Auger amplitude of channel j of transition i
+   ! Calculates the Auger amplitude of channel j of transition i 
    ! by summing over the 'pure' Auger matrix using the proper weights of
    ! transition i.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in) :: i, j
@@ -628,7 +618,7 @@ contains
       l     = angular_momentum_l(transition(i)%channel(j)%kappa)
       phase = transition(i)%channel(j)%phase
       !
-      transition(i)%channel(j)%amplitude_re = value
+      transition(i)%channel(j)%amplitude_re = value         
       transition(i)%channel(j)%amplitude    = cmplx(zero,one)**l *           &
                               exp( -cmplx(zero,one)*phase) * cmplx(value,zero)
       !
@@ -691,7 +681,7 @@ contains
       yes = get_yes_stream()
       if (.not.yes) goto 10
       !
-      ! Select individual pairs of transitions
+      ! Select individual pairs of transitions 
       call input_transition_pairs(number_of_transitions)
       !
       print *, "Include exchange interactions into the generation of the"//&
@@ -752,7 +742,7 @@ contains
       else
          auger_energy_shift = auger_energy_shift / energy_factor
       end if
-      !
+      !         
     5 print *, "Enter a minimal energy (> =0.) of the free electron"        //&
                " (in"//trim(energy_unit)//"):"
       print *, " All other transitions are neglected from the computations;"
@@ -765,7 +755,7 @@ contains
       else
          auger_lowest_transition = auger_lowest_transition / energy_factor
       end if
-      !
+      !         
     6 print *, "Enter a maximal (-)kappa symmetry up to which continuum"//&
                " spinors are taken into account ?"
       print *, " 2 (up to p-waves), 4(f), 6(i), 8(k), ...;"//&
@@ -813,12 +803,12 @@ contains
    end subroutine auger_collect_input
    !
    !
-   function auger_delta_energy(level_1,level_2,asf_set)  result(delta_e)
+   function auger_delta_energy(level_1,level_2,asf_set)  result(delta_e)         
    !--------------------------------------------------------------------
    ! Returns the energy difference between two given levels of the same
    ! multiplett.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in)         :: level_1, level_2
@@ -855,9 +845,9 @@ contains
    subroutine auger_initialize()
    !--------------------------------------------------------------------
    ! Initializes the computation of Auger rates, lifetimes, angular
-   ! distribution parameters and others.
-   !
-   ! Calls:
+   ! distribution parameters and others. 
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer :: i, mtp, noasf, nocsf, number_of_rwf
@@ -876,7 +866,7 @@ contains
          call auger_print_transitions(24)
       end if
       !
-      ! Make a 'copy' of asf_final into asf_bound and wave_final into
+      ! Make a 'copy' of asf_final into asf_bound and wave_final into 
       ! wave_bound (kept in rabs_cowf) to use the COWF component
       noasf = asf_final%noasf;   nocsf = asf_final%csf_set%nocsf
       allocate( asf_bound%asf(1:noasf) )
@@ -903,7 +893,7 @@ contains
    !
    subroutine auger_print_amplitudes(stream)
    !--------------------------------------------------------------------
-   ! Prints the information about all (selected) transitions and amplitudes
+   ! Prints the information about all (selected) transitions and amplitudes 
    ! to a (.trn) transition amplitude file on stream.
    !
    !--------------------------------------------------------------------
@@ -924,14 +914,14 @@ contains
       write(stream,*) " "
       !
       channels = 0
-      do  i = 1,number_of_transitions
+      do  i = 1,number_of_transitions 
          channels = channels + transition(i)%number_of_channels
       end do
       write(stream,*) channels, "= Number_of_channels"
       write(stream,*) " "
       !
-      do  i = 1,number_of_transitions
-         do  j = 1,transition(i)%number_of_channels
+      do  i = 1,number_of_transitions 
+         do  j = 1,transition(i)%number_of_channels   
             write(stream,1) transition(i)%asfi,transition(i)%asff,         &
                             transition(i)%level_i,transition(i)%level_f,   &
                             transition(i)%totalJ_i,transition(i)%totalJ_f, &
@@ -998,7 +988,7 @@ contains
               /24x,"Seconds              1/s   ",12x,"Hartrees",             &
                12x,"Kaysers",15x,"eV",                                       &
               / 1x,115("-") )
-   12 format(3x,i4,6x,5(1pd20.7))
+   12 format(3x,i4,6x,5(1pd20.7)) 
    13 format(   1x,115("-"))
       !
       ! Print the Auger rates of this calculation
@@ -1013,7 +1003,7 @@ contains
       !
       total_rate = zero
       do  i = 1,number_of_transitions
-         total_rate = total_rate + transition(i)%probability
+         total_rate = total_rate + transition(i)%probability  
       end do
       !
       rate = zero; ratio = zero; total = zero
@@ -1023,7 +1013,7 @@ contains
          else
             energy = energy_factor * transition(i)%energy
          end if
-         rate = transition(i)%probability * auger_rate_factor
+         rate = transition(i)%probability * auger_rate_factor 
          !
          !        auger_print_only_gt_1percent                              &
         ratio = rate/(total_rate *  auger_rate_factor)
@@ -1034,8 +1024,8 @@ contains
                             transition(i)%parity_i,                         &
                   trim(angular_momentum_string(transition(i)%totalJ_f,4)),  &
                             transition(i)%parity_f,                         &
-                            energy,rate,ratio
-         end if
+                            energy,rate,ratio 
+         end if                              
       end do
       write(stream,9)
       !
@@ -1072,9 +1062,9 @@ contains
          end do
          write(stream,9)
       end if
+      ! 
       !
-      !
-      ! Print Auger spin-polarization parameters
+      ! Print Auger spin-polarization parameters 
       !
       if (auger_calc_spin_polarization) then
          write(stream,*) " "
@@ -1117,14 +1107,14 @@ contains
          end if
       end do
       write(stream,13)
-      !
+      ! 
    end subroutine auger_print_results
    !
    !
    subroutine auger_print_transitions(stream)
    !--------------------------------------------------------------------
-   ! Prints a neat table of all selected transitions on stream before
-   ! the actual computation starts; only the quantum numbers of the atomic
+   ! Prints a neat table of all selected transitions on stream before 
+   ! the actual computation starts; only the quantum numbers of the atomic 
    ! states and the transition energies are displayed.
    !
    ! Calls: angular_momentum_string(), get_kappa_channels().
@@ -1159,11 +1149,11 @@ contains
                   transition(i)%parity_f,energy,                           &
 		  (orbital_symmetry(kappa_channel(j)),j=1,mchannel)
       end do
-      write(stream,3)
+      write(stream,3) 
     1 format(/,"The following ",i5," transitions are selected:",           &
         //,"     I-level-F     I--J^P--F      Transition Energy       ",   &
            "Orbital symmetries (emitted)",                                 &
-         /,"                                     (in ",a4,")  ",           &
+         /,"                                     (in ",a4,")  ",           &  
          /,4x,83("-") )
     2 format(4x,i4," -",i4,3x,a4,a1,3x,a4,a1,5x,1pe14.7,9x,10(a2,1x))
     3 format(4x,83("-") )
@@ -1179,213 +1169,209 @@ contains
    ! The procedure takes into account the Coulomb interaction to the
    ! Auger matrix and, if required, also the Breit interaction.
    !
-   ! Calls:
+   ! Calls:  
    !--------------------------------------------------------------------
+      !
       type(csf_basis), intent(in) :: csf_set
       integer, intent(in)         :: ii
-
+      !
       integer           :: i, ia, ib, ic, id, j, no_T_coeff, no_V_coeff, r, s, &
                            ss, t, xnu, Vnu, rrr, sss, asfi, asff
       character(len=30) :: xstring
       real(kind=dp)     :: aweight, xvalue, xweight
       type(nkappa)      :: aa, bb, cc, dd
       type(nkappa)      :: Va, Vb, Vc, Vd
-
-      ! Local thread-private arrays for reduction
-      real(kind=dp), dimension(:,:), allocatable :: local_matrix
-      integer :: local_number_radial_integrals
-      real(kind=dp), dimension(1:500) :: local_radial_value
-      character(len=25), dimension(1:500) :: local_radial_string
-
+      !
       if (rabs_use_stop   .and.   csf_set%nocsf /= auger%no_f+auger%no_i) then
          stop "auger_pure_matrix(): program stop A."
       end if
-
-      ! Initialize global variables
+      !
       number_radial_integrals = 0
+      !
       auger%matrix = zero
-
-      ! Allocate thread-private matrix
-      allocate(local_matrix(1:auger%no_f,1:auger%no_i))
-      local_matrix = zero
-      local_number_radial_integrals = 0
-      local_radial_value = zero
-      local_radial_string = ""
-
+      !
       if (auger_nonorthogonal_eval) then
          call nonorth_initialize_ci(csf_set,wave_final,wave_initial,auger_csp)
       end if
-
-      ! Parallelize the outer loops over r and s
-      !$OMP PARALLEL PRIVATE(r, s, rrr, ss, sss, t, Va, Vb, Vc, Vd, Vnu, &
-      !$OMP                  aweight, ia, ib, ic, id, i, j, xweight, xnu, &
-      !$OMP                  aa, bb, cc, dd, xvalue, xstring) &
-      !$OMP          SHARED(csf_set, auger, wave_final, wave_initial, auger_csp)
-      !$OMP DO COLLAPSE(2) SCHEDULE(DYNAMIC) REDUCTION(+:local_matrix)
-      do r = 1,auger%no_f
-         do s = auger%no_f+1,auger%no_f+auger%no_i
-            rrr = auger%ndx_f(r)
+      !
+      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(r, rrr, s, ss, sss, t, &
+      !$OMP&   ia, ib, ic, id, i, Va, Vb, Vc, Vd, Vnu, aweight, &
+      !$OMP&   xvalue, xweight, xstring, xnu, aa, bb, cc, dd) &
+      !$OMP&   REDUCTION(+:auger%matrix) SCHEDULE(DYNAMIC)
+      do  r = 1,auger%no_f
+         rrr = auger%ndx_f(r)
+         do  s = auger%no_f+1,auger%no_f+auger%no_i
             ss  = s - auger%no_f
             sss = auger%ndx_i(ss)
-
-            if (auger_nonorthogonal_eval) then
-               Aoperator%particle = 2
-               Aoperator%rank     = 0
-               Aoperator%parity   = 1
+	    !
+	    if (auger_nonorthogonal_eval) then
+	       !
+	       ! Use an expansion into Slater determinants to evaluate the
+	       ! Auger matrix
+	       Aoperator%particle = 2
+	       Aoperator%rank	  = 0
+	       Aoperator%parity   = 1
+	       !
                call nonorth_calculate_csf_pair(csf_set,Aoperator,r,s,no_V_coeff)
-            else
+	    else
+	       !
+	       ! Use standard Racah algebra to evaluate the many-electron
+	       ! Auger matrix
                call anco_calculate_csf_pair(csf_set,r,s,no_T_coeff,no_V_coeff)
-            end if
-
+	    end if
+            !
             ! Cycle over all angular coefficients
-            do t = 1,no_V_coeff
-               if (auger_nonorthogonal_eval) then
-                  Va    = nonorth_V_list(t)%a
-                  Vb    = nonorth_V_list(t)%b
-                  Vc    = nonorth_V_list(t)%c
-                  Vd    = nonorth_V_list(t)%d
-                  Vnu   = nonorth_V_list(t)%nu
+            do  t = 1,no_V_coeff
+	       if (auger_nonorthogonal_eval) then
+	          Va	  = nonorth_V_list(t)%a
+	          Vb	  = nonorth_V_list(t)%b
+	          Vc	  = nonorth_V_list(t)%c
+	          Vd	  = nonorth_V_list(t)%d
+	          Vnu	  = nonorth_V_list(t)%nu
                   aweight = nonorth_V_list(t)%V
-               else
-                  Va = anco_V_list(t)%a
-                  Vb = anco_V_list(t)%b
-                  Vc = anco_V_list(t)%c
-                  Vd = anco_V_list(t)%d
-                  Vnu     = anco_V_list(t)%nu
+	       else
+	          Va = anco_V_list(t)%a
+	          Vb = anco_V_list(t)%b
+	          Vc = anco_V_list(t)%c
+	          Vd = anco_V_list(t)%d
+	          Vnu     = anco_V_list(t)%nu
                   aweight = anco_V_list(t)%V
-               end if
-
-               ia = 0; ib = 0; ic = 0; id = 0
-               do i = 1,wave_final%number_of_rwf
-                  if (wave_final%rwf(i)%orbital == Va) ia = i
-                  if (wave_final%rwf(i)%orbital == Vb) ib = i
+	       end if
+	       !
+	       !
+               ia = 0;   ib = 0;   ic = 0;   id = 0
+               do  i = 1,wave_final%number_of_rwf
+                  if (wave_final%rwf(i)%orbital == Va) then
+                     ia = i
+                  end if
+                  if (wave_final%rwf(i)%orbital == Vb) then
+                     ib = i
+                  end if
                end do
-               do i = 1,wave_initial%number_of_rwf
-                  if (wave_initial%rwf(i)%orbital == Vc) ic = i
-                  if (wave_initial%rwf(i)%orbital == Vd) id = i
+               do  i = 1,wave_initial%number_of_rwf
+                  if (wave_initial%rwf(i)%orbital == Vc) then
+                     ic = i
+                  end if
+                  if (wave_initial%rwf(i)%orbital == Vd) then
+                     id = i
+                  end if
                end do
-
+               !
                if (Va%n < 0 .and. Vb%n > 0) then
-                  local_matrix(r,ss) = local_matrix(r,ss) + aweight * &
-                     XL_Coulomb_strength_grasp2k(Vnu,auger_csp, &
-                        wave_final%rwf(ib),wave_initial%rwf(ic), &
-                        wave_initial%rwf(id),.false.)
-
-                  if (auger_print_radial_integrals) then
-                     xweight = aweight
-                     xnu     = Vnu
-                     aa%n     = auger_csp%orbital%n
-                     aa%kappa = auger_csp%orbital%kappa
-                     bb%n     = wave_final%rwf(ib)%orbital%n
-                     bb%kappa = wave_final%rwf(ib)%orbital%kappa
-                     cc%n     = wave_initial%rwf(ic)%orbital%n
-                     cc%kappa = wave_initial%rwf(ic)%orbital%kappa
-                     dd%n     = wave_initial%rwf(id)%orbital%n
-                     dd%kappa = wave_initial%rwf(id)%orbital%kappa
-                     xvalue = XL_Coulomb_strength_grasp2k(Vnu,auger_csp, &
-                        wave_final%rwf(ib),wave_initial%rwf(ic), &
-                        wave_initial%rwf(id),.false.)
-                     xstring = Xk_name(xnu,aa%n,aa%kappa,bb%n,bb%kappa, &
-                        cc%n,cc%kappa,dd%n,dd%kappa)
-                     !$OMP CRITICAL(print_radial)
-                     print *, "(a) r, s:",trim(xstring),r,s,xweight,xvalue, &
-                        xweight*xvalue,local_matrix(r,ss)
-                     !$OMP END CRITICAL
+                  auger%matrix(r,ss) = auger%matrix(r,ss) + aweight *          &
+                     XL_Coulomb_strength_grasp2k(Vnu,auger_csp,  &
+                                                 wave_final%rwf(ib),           &
+                            wave_initial%rwf(ic),wave_initial%rwf(id),.false.)
+                  !
+                  if (.true.  .or.  auger_print_radial_integrals)  then
+		    xweight  = aweight
+                    xnu      = Vnu
+                    aa%n     = auger_csp%orbital%n   
+                    aa%kappa = auger_csp%orbital%kappa 
+                    bb%n     = wave_final%rwf(ib)%orbital%n  
+                    bb%kappa = wave_final%rwf(ib)%orbital%kappa  
+                    cc%n     = wave_initial%rwf(ic)%orbital%n  
+                    cc%kappa = wave_initial%rwf(ic)%orbital%kappa  
+                    dd%n     = wave_initial%rwf(id)%orbital%n  
+                    dd%kappa = wave_initial%rwf(id)%orbital%kappa  
+                    Xvalue   = XL_Coulomb_strength_grasp2k(Vnu,  &
+                                       auger_csp,wave_final%rwf(ib),           &
+                            wave_initial%rwf(ic),wave_initial%rwf(id),.false.)
+                    xstring(:) = " "
+                    xstring    = Xk_name(xnu,aa%n,aa%kappa,bb%n,bb%kappa,      &
+                                             cc%n,cc%kappa,dd%n,dd%kappa)
+	            print *, "(a) r, s:",trim(xstring),r,s,xweight,xvalue,     &
+		       xweight*xvalue,auger%matrix(r,ss)
                   end if
-
+                  !
+                  ! Breit contributions
                   if (auger_include_breit) then
-                     local_matrix(r,ss) = local_matrix(r,ss) + aweight * &
-                        XL_Breit0_strength_grasp2k(Vnu,auger_csp, &
-                           wave_final%rwf(ib),wave_initial%rwf(ic), &
-                           wave_initial%rwf(id))
+                     auger%matrix(r,ss) = auger%matrix(r,ss) + aweight *       &
+                        XL_Breit0_strength_grasp2k(Vnu,auger_csp,&
+                                                   wave_final%rwf(ib),         &
+                              wave_initial%rwf(ic),wave_initial%rwf(id))
                   end if
-               else if (Va%n > 0 .and. Vb%n < 0) then
-                  local_matrix(r,ss) = local_matrix(r,ss) + aweight * &
-                     XL_Coulomb_strength_grasp2k(Vnu,wave_final%rwf(ia), &
-                        auger_csp,wave_initial%rwf(ic), &
-                        wave_initial%rwf(id),.false.)
-
-                  if (auger_print_radial_integrals) then
-                     xweight = aweight
-                     xnu     = Vnu
-                     aa%n     = wave_final%rwf(ia)%orbital%n
-                     aa%kappa = wave_final%rwf(ia)%orbital%kappa
-                     bb%n     = auger_csp%orbital%n
-                     bb%kappa = auger_csp%orbital%kappa
-                     cc%n     = wave_initial%rwf(ic)%orbital%n
-                     cc%kappa = wave_initial%rwf(ic)%orbital%kappa
-                     dd%n     = wave_initial%rwf(id)%orbital%n
-                     dd%kappa = wave_initial%rwf(id)%orbital%kappa
-                     xvalue = XL_Coulomb_strength_grasp2k(Vnu, &
-                        wave_final%rwf(ia),auger_csp, &
-                        wave_initial%rwf(ic),wave_initial%rwf(id),.false.)
-                     xstring = Xk_name(xnu,aa%n,aa%kappa,bb%n,bb%kappa, &
-                        cc%n,cc%kappa,dd%n,dd%kappa)
-                     !$OMP CRITICAL(print_radial)
-                     print *, "(b) r, s:",trim(xstring),r,s,xweight,xvalue, &
-                        xweight*xvalue,local_matrix(r,ss)
-                     !$OMP END CRITICAL
+               else if (Va%n > 0 .and. Vb%n < 0)then
+	          !
+                  auger%matrix(r,ss) = auger%matrix(r,ss) + aweight *          &
+                     XL_Coulomb_strength_grasp2k(Vnu,            &
+                            wave_final%rwf(ia),auger_csp,                      &
+                            wave_initial%rwf(ic),wave_initial%rwf(id),.false.)
+                  !
+                  if (auger_print_radial_integrals)  then
+                    !!x print *, "auger_pure_matrix: b"
+		    xweight  = aweight
+                    xnu      = Vnu
+                    aa%n     = wave_final%rwf(ia)%orbital%n  
+                    aa%kappa = wave_final%rwf(ia)%orbital%kappa  
+                    bb%n     = auger_csp%orbital%n   
+                    bb%kappa = auger_csp%orbital%kappa 
+                    cc%n     = wave_initial%rwf(ic)%orbital%n  
+                    cc%kappa = wave_initial%rwf(ic)%orbital%kappa  
+                    dd%n     = wave_initial%rwf(id)%orbital%n  
+                    dd%kappa = wave_initial%rwf(id)%orbital%kappa  
+                    xvalue   = XL_Coulomb_strength_grasp2k(Vnu,  &
+                            wave_final%rwf(ia),auger_csp,                      &
+                            wave_initial%rwf(ic),wave_initial%rwf(id),.false.) 
+                    xstring(:) = " "
+                    xstring    = Xk_name(xnu,aa%n,aa%kappa,bb%n,bb%kappa,  &
+                                             cc%n,cc%kappa,dd%n,dd%kappa)
+	            print *, "(b) r, s:",trim(xstring),r,s,xweight,xvalue,     &
+		             xweight*xvalue,auger%matrix(r,ss)
                   end if
-
+                  !
+                  ! Breit contributions
                   if (auger_include_breit) then
-                     local_matrix(r,ss) = local_matrix(r,ss) + aweight * &
-                        XL_Breit0_strength_grasp2k(Vnu,wave_final%rwf(ia), &
-                           auger_csp,wave_initial%rwf(ic), &
-                           wave_initial%rwf(id))
+                     auger%matrix(r,ss) = auger%matrix(r,ss) + aweight *       &
+                        XL_Breit0_strength_grasp2k(Vnu,          &
+                                wave_final%rwf(ia),auger_csp,                  &
+                                wave_initial%rwf(ic),wave_initial%rwf(id))
                   end if
                else
                   stop "auger_pure_matrix(): program stop B."
                end if
-
-               ! Handle radial integrals printing
-               if (auger_print_radial_integrals) then
-                  if (abs(xvalue) >= 1.0e-4) then
-                     !$OMP CRITICAL(radial_count)
-                     do j = 1,number_radial_integrals
-                        if (radial_string(j) == xstring) goto 1
-                     end do
-                     number_radial_integrals = number_radial_integrals + 1
-                     radial_string(number_radial_integrals) = xstring
-                     radial_value(number_radial_integrals) = xvalue
-                   1 continue
-                     !$OMP END CRITICAL
-                  end if
+               !
+               if (auger_print_radial_integrals)  then
+                  xstring(:) = " "
+                  xstring    = Xk_name(xnu,aa%n,aa%kappa,bb%n,bb%kappa,  &
+                                           cc%n,cc%kappa,dd%n,dd%kappa)
+                  if (abs(xvalue) < 1.0e-4)  goto 1
+                  do  j = 1,number_radial_integrals
+                     if (radial_string(j) == xstring) goto 1
+                  end do 
+                  number_radial_integrals = number_radial_integrals + 1
+                  radial_string(number_radial_integrals) = xstring
+                  radial_value(number_radial_integrals)  = xvalue
+                1 continue
                end if
+               !
             end do
          end do
       end do
-      !$OMP END DO
-
-      ! Reduce local matrices to global matrix
-      !$OMP CRITICAL
-      auger%matrix = auger%matrix + local_matrix
-      !$OMP END CRITICAL
-      !$OMP END PARALLEL
-
-      deallocate(local_matrix)
-
-      ! Print radial integrals (outside parallel region)
-      if (auger_print_radial_integrals) then
+      !$OMP END PARALLEL DO
+      !
+      if (auger_print_radial_integrals)  then
          print *, " "
          print *, "Effective interactions strengths (|X^k()| > 10^-4) for "// &
                   "the current transition; continuum orbital has n=11"
          print *, "-------------------------------------------------------"// &
                   "--------------------------------------------------"
          print *, " "
-         write(*,2) (trim(radial_string(j)),radial_value(j), &
-                    j=1,number_radial_integrals)
+         write(*,2) (trim(radial_string(j)),radial_value(j),                  &
+                                                   j=1,number_radial_integrals)
        2 format(4(3x,a25," = ",f6.4,";"))
       end if
+      !
    end subroutine auger_pure_matrix
    !
    !
-   function auger_return_amplitude(level_i,level_f,kappa)    result(amp)
+   function auger_return_amplitude(level_i,level_f,kappa)    result(amp)         
    !--------------------------------------------------------------------
-   ! Return the amplitude of the Auger channel (J_f kappa |V| J_i) from
+   ! Return the amplitude of the Auger channel (J_f kappa |V| J_i) from 
    ! the (precalculated) Auger channels or zero, if this amplitude is not
    ! defined or calculated.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in) :: level_i,level_f,kappa
@@ -1409,12 +1395,12 @@ contains
    end function auger_return_amplitude
    !
    !
-   subroutine auger_rho_after_dipole(k,nl,J1_levels,matrix)
+   subroutine auger_rho_after_dipole(k,nl,J1_levels,matrix)         
    !--------------------------------------------------------------------
    ! Calculates the density matrix of the intermediate states from the
    ! statistical tensor of the initial (resonant) state and the amplitudes
    ! of the first-step Auger decay. In the present case, however, the
-   ! density matrix of the initial states assumes already a coherent
+   ! density matrix of the initial states assumes already a coherent 
    ! dipole excitation of two J0 = 1 levels following the excitation with
    ! linearly polarized light along the z-axis.
    !
@@ -1422,7 +1408,7 @@ contains
    ! levels both with J0 = 1; the corresponding density is obtained from
    ! a call to the procedure auger_rho_dipole_excitation().
    !
-   ! Calls:
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in)                           :: k, nl
@@ -1471,7 +1457,7 @@ contains
                   Gamma_J0_J0p = half *                                       &
                                  (auger_width(J0_lev)+auger_width(J0p_lev))
                   delta_e      = auger_delta_energy(J0_lev,J0p_lev,asf_initial)
-                  !
+                  !   
                   wa = wigner_6j_symbol(J0,J1,j,J1p,J0p,k+k)                * &
                   auger_return_amplitude(J0_levels(i0),J1_levels(i1),kappa) * &
                   conjg(auger_return_amplitude(J0_levels(i0p),                &
@@ -1501,13 +1487,13 @@ contains
    end subroutine auger_rho_after_dipole
    !
    !
-   subroutine auger_rho_density(k,J0_level,nl,J1_levels,matrix)
+   subroutine auger_rho_density(k,J0_level,nl,J1_levels,matrix)         
    !--------------------------------------------------------------------
    ! Calculates the density matrix of the intermediate states from the
    ! statistical tensor of the initial (resonant) state and the amplitudes
    ! of the first-step Auger decay [cf. Ueda et al., JPB (1999), Eq. (6)].
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in)                           :: k, J0_level, nl
@@ -1570,7 +1556,7 @@ contains
    end subroutine auger_rho_density
    !
    !
-   subroutine auger_rho_dipole_excitation(k,nl,J0_levels,matrix)
+   subroutine auger_rho_dipole_excitation(k,nl,J0_levels,matrix)         
    !--------------------------------------------------------------------
    ! Calculates the density matrix of the coherently-excited initial
    ! states of an Auger cascade by linearly polarized light along the
@@ -1578,8 +1564,8 @@ contains
    ! gas configuration with J_g = 0 and that all J0_levels levels have
    ! total angular momentum J0 = 1. The amplitudes must be set
    ! explicitly inside of this procedure.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in)                           :: k, nl
@@ -1599,11 +1585,11 @@ contains
       ! Babushkin gauge
       dipole_amplitudes(2) = cmplx(-1.3686616e-3_dp,zero)
       dipole_amplitudes(3) = cmplx( 8.1854684e-5_dp,zero)
-      !
+      ! 
       ! Coulomb gauge
       ! dipole_amplitudes(2) = cmplx( 1.6357207e-3_dp,zero)
       ! dipole_amplitudes(3) = cmplx(-9.5924369e-5_dp,zero)
-      !
+      ! 
       if (first) then
       !t awd2 = auger_width_dipole(2)
       !t awd3 = auger_width_dipole(3)
@@ -1639,7 +1625,7 @@ contains
                matrix(i0,i0p) = sqrt(one/three) * di * conjg(dip)
             else if (k == 2) then
                matrix(i0,i0p) = - sqrt(two/three) * di * conjg(dip)
-            else
+            else     
                stop "auger_rho_dipole_excitation(): program stop B."
             end if
             !
@@ -1662,6 +1648,8 @@ contains
       !
       ! Allocate an appropriate array for the overlap integrals
       kappa_min = 100;  kappa_max = -100;  pqn_i_max = -100;  pqn_f_max = -100
+      !$OMP PARALLEL DO DEFAULT(SHARED) PRIVATE(i1, i2, kappa, pqn_f, pqn_i) &
+      !$OMP&            COLLAPSE(2) SCHEDULE(STATIC)
       do  i1 = 1,wave_initial%number_of_rwf
          kappa_min = min(kappa_min, wave_initial%rwf(i1)%orbital%kappa)
          kappa_max = max(kappa_max, wave_initial%rwf(i1)%orbital%kappa)
@@ -1688,6 +1676,7 @@ contains
             end if
          end do
       end do
+      !$OMP END PARALLEL DO
       !
       ! Print the overlap integrals
       do  i1 = 1,wave_final%number_of_rwf
@@ -1706,7 +1695,7 @@ contains
    !
    subroutine auger_set_transitions()
    !--------------------------------------------------------------------
-   ! Determines how many and which transitions need to be calculated and
+   ! Determines how many and which transitions need to be calculated and 
    ! initializes the array transitions of type(auger_transitions).
    ! The default is (for number_of_transitions == 0) that all transitions
    ! with a positive energy are calculated; for number_of_transitions /= 0,
@@ -1714,7 +1703,7 @@ contains
    ! initialized instead; in this case also negative transition energies
    ! are allowed and may be overritten by appropriate experimental energies.
    !
-   ! Calls:
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer       :: asfi, asff, i, imin, j, k, m, nchannels, nt
@@ -1742,7 +1731,7 @@ contains
                        (select_level_f(k) == asf_final%asf(j)%level_No   .or. &
                         select_level_f(k) == 0)                         .and. &
                        (asf_initial%asf(i)%energy - asf_final%asf(j)%energy   &
-                         + auger_energy_shift > auger_lowest_transition) ) then
+                         + auger_energy_shift > auger_lowest_transition) ) then 
                      nt = nt + 1
                   end if
                end do
@@ -1756,7 +1745,6 @@ contains
       ! Now initialize all transitions
       nt = 0
       if (number_of_transitions == 0) then
-         !$OMP PARALLEL DO REDUCTION(+:nt)
          do  i = 1,asf_initial%noasf
             do  j = 1,asf_final%noasf
                if (asf_initial%asf(i)%energy - asf_final%asf(j)%energy  &
@@ -1792,7 +1780,6 @@ contains
                end if
             end do
          end do
-         !$OMP END PARALLEL DO
       else
          do  i = 1,asf_initial%noasf
             do  j = 1,asf_final%noasf
@@ -1802,7 +1789,7 @@ contains
                        (select_level_f(k) == asf_final%asf(j)%level_No   .or. &
                         select_level_f(k) == 0)                         .and. &
                        (asf_initial%asf(i)%energy - asf_final%asf(j)%energy   &
-                        + auger_energy_shift  > auger_lowest_transition) ) then
+                        + auger_energy_shift  > auger_lowest_transition) ) then 
                      nt = nt + 1
                      transition(nt)%asfi     = i;   transition(nt)%asff = j
                      transition(nt)%level_i  = asf_initial%asf(i)%level_No
@@ -1900,9 +1887,9 @@ contains
          do  m = 1,nchannels
             if (abs(kappa_channel(m)) <= auger_maximal_kappa) then
                i = i + 1
-               transition(nt)%channel(i)%kappa      = kappa_channel(m)
+               transition(nt)%channel(i)%kappa      = kappa_channel(m)    
                transition(nt)%channel(i)%amplitude  = cmplx(zero,zero)
-            end if
+            end if 
          end do
          !
       end do
@@ -1918,15 +1905,15 @@ contains
    !--------------------------------------------------------------------
    ! Returns the eta_k spin angular coefficient for the transition
    ! which is given in terms of a number of individual channels.
-   ! It uses the explicit expression in terms of the partial wave
-   ! transition amplitudes as given by J Tulkki, H Aksela, and
+   ! It uses the explicit expression in terms of the partial wave 
+   ! transition amplitudes as given by J Tulkki, H Aksela, and 
    ! N M Kabachnik (Phys. Rev. A 48, 1277 (1993), eq. A27).
    !
-   ! Calls:
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in)    :: k
-      type(auger_transition) :: trans
+      type(auger_transition) :: trans 
       real(kind=dp)          :: eta
       !
       integer          :: iphase, ja, jb, la, lb, ma, mb
@@ -1984,10 +1971,10 @@ contains
    !--------------------------------------------------------------------
    ! Calculates all selected Auger properties of transition i from the
    ! amplitudes of the individual channels. This concerns the total
-   ! probability as well as angular distribution and spin polarization
+   ! probability as well as angular distribution and spin polarization 
    ! parameters.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       type(auger_transition), intent(inout) :: trans
@@ -2024,7 +2011,7 @@ contains
                          trim(angular_momentum_string(trans%totalJ_i)),  &
 		         " ",trans%parity_i,"   ----> ",                 &
 	                 trim(angular_momentum_string(trans%totalJ_f)),  &
-		         " ",trans%parity_f
+		         " ",trans%parity_f		  
 	 write(stream,*) " --------------------------------------------"//  &
 	                 "------------------"
 	 write(stream,*) " "
@@ -2073,14 +2060,14 @@ contains
    end subroutine auger_transition_properties
    !
    !
-   function auger_width(level_i)                           result(width)
+   function auger_width(level_i)                           result(width)         
    !--------------------------------------------------------------------
    ! Return the width of the 'initial' level_i as been derived from the
    ! precalculated transition probabilities into lower-lying levels.
    ! It assumes that all important decay branches are included in the
    ! computations.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in) :: level_i

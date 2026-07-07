@@ -8,7 +8,7 @@
 # ---------------------
 export    FCP=gfortran
 export    FCQ=gfortran
-export    FFL="-c -O3"
+export    FFL="-c"
 export    LIB="-ldvdson -llapackd -llapacku -lblas"
 export    LLP="-L./lib"
 

@@ -3,18 +3,18 @@ module rabs_photo
 !***** July 2010 *****
 !-----------------------------------------------------------------------
 ! This module contains the procedures which are specific to the PHOTO
-! program. This program supports the calculation of photoionization cross
-! sections, relative cross sections angular distribution parameters.
-! The continuum orbitals which are required for these computations are
+! program. This program supports the calculation of photoionization cross 
+! sections, relative cross sections angular distribution parameters. 
+! The continuum orbitals which are required for these computations are 
 ! generated automatically by a call to the COWF component.
 ! At the present, the program supports nonorthogonality between the
 ! orbitals only via the form of the radial functions. In the evaluation
 ! of the many-electron matrix elements, by contrast, orthogonality is
-! 'assumed' and, hence, standard Racah algebra techniques applied. See
+! 'assumed' and, hence, standard Racah algebra techniques applied. See 
 ! the component ANCO for calculating the angular integrals for non-scalar
 ! one-particle matrix elements.
 ! In this module below, there are several procedures also for the file
-! handling and the intermediate storage to accelerate some of the
+! handling and the intermediate storage to accelerate some of the 
 ! computations.
 !-----------------------------------------------------------------------
    !
@@ -47,18 +47,18 @@ module rabs_photo
                  ! Calculates the C(kappa,kappa',L) factor as defined by
                  ! Huang (1980).
    public  :: photo_calculate_amplitudes
-                 ! Calculates for all selected 'photon energies' (in turn) the
+                 ! Calculates for all selected 'photon energies' (in turn) the 
                  ! required continuum spinors and photoionization amplitudes.
    private :: photo_calculate_Bessel
                  ! Calculates the Bessel function over the radial grid
                  ! for a given factor.
    private :: photo_channel_amplitude
-                 ! Calculates the photoionization amplitude of a channel from
-                 ! the 'pure' photoionization matrix and the corresponding
+                 ! Calculates the photoionization amplitude of a channel from 
+                 ! the 'pure' photoionization matrix and the corresponding 
                  ! mixing coefficients.
    public  :: photo_collect_input
                  ! Collects and proceeds all input for the calculation of
-		 ! photoionization cross sections and angular distribution
+		 ! photoionization cross sections and angular distribution 
                  ! parameters.
    public  :: photo_initialize
 		 ! Set up the selected transitions and initializes some
@@ -73,16 +73,16 @@ module rabs_photo
                  ! Returns the B-5k coefficient as defined by Nicolai Kabachnik
 		 ! (2006) for the collaboration with Fabiana (Italy).
    private :: photo_line_properties
-                 ! Calculates all selected photoionization properties of line i
+                 ! Calculates all selected photoionization properties of line i 
 		 ! from the amplitudes of the individual channels.
    public  :: photo_print_amplitudes
                  ! Writes out the information about all (selected)
                  ! photoionzation channels and amplitudes to a (.chn) file
    private :: photo_print_lines
-                 ! Prints all selected 'photon' or 'electron' lines in a neat
+                 ! Prints all selected 'photon' or 'electron' lines in a neat 
                  ! format before the computation starts.
    public  :: photo_print_results
-                 ! Writes the cross sections and angular distribution
+                 ! Writes the cross sections and angular distribution 
                  ! parameters to the .sum file.
    private :: photo_pure_matrix
                  ! Calculates the 'pure' photoionization matrix for the given
@@ -107,26 +107,26 @@ module rabs_photo
    !
    ! Storage for the initial and final atomic states and wave functions
    !
-   ! Define a 'configuration scheme' to be built up during execution
+   ! Define a 'configuration scheme' to be built up during execution 
    type(grasp2k_orbital), public :: wave_continuum
    type(orbital_function)        :: photo_csp
    !
    ! Define an internal structure type(photo_transition) which stores all
    ! necessary information for an photoionization line
    type :: photo_channel
-      integer          :: kappa, totalJ
-      character(len=1) :: parity
-      character(len=2) :: multipole
-      character(len=9) :: gauge
-      real(kind=dp)    :: phase, amplitude_re
-      complex(kind=dp) :: amplitude
+      integer          :: kappa, totalJ   
+      character(len=1) :: parity 
+      character(len=2) :: multipole  
+      character(len=9) :: gauge 
+      real(kind=dp)    :: phase, amplitude_re  
+      complex(kind=dp) :: amplitude   
    end type photo_channel
    !
    type :: photo_line
       integer          :: asfi, asff, level_i, level_f, totalJ_i, totalJ_f
       integer          :: No_channels
       character(len=1) :: parity_i, parity_f
-      real(kind=dp)    :: p_energy, e_energy, cs_coulomb, cs_babushkin
+      real(kind=dp)    :: p_energy, e_energy, cs_coulomb, cs_babushkin 
       complex(kind=dp) :: beta_b, beta_c, xi_b, xi_c, eta_b, eta_c, &
                           zeta_b, zeta_c, alignment_b, alignment_c
       real(kind=dp), dimension(:), pointer :: bessel0, bessel1, bessel2, &
@@ -137,9 +137,9 @@ module rabs_photo
    type(photo_line), dimension(:), allocatable :: line
    !
    type :: photo_matrix
-      integer :: No_f, No_i
-      integer, dimension(:), pointer         :: ndx_f, ndx_i
-      real(kind=dp), dimension(:,:), pointer :: matrix
+      integer :: No_f, No_i  
+      integer, dimension(:), pointer         :: ndx_f, ndx_i  
+      real(kind=dp), dimension(:,:), pointer :: matrix   
    end type photo_matrix
    !
    type(photo_matrix) :: photo
@@ -152,7 +152,7 @@ module rabs_photo
    integer, public  :: photo_maximal_kappa                   = 20
    !
    ! Define global logical flags for the control of the PHOTO program; the
-   ! default values for these flags may be overwritten interactively during
+   ! default values for these flags may be overwritten interactively during 
    ! input time
    logical, public :: photo_add_1                     = .false.,  &
                       photo_apply_exp_energies        = .false.,  &
@@ -175,10 +175,10 @@ module rabs_photo
                        photo_energy_shift  = zero, photo_maximal_energy
    character(len=7) :: photo_cs_unit
    !
-   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i)
+   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i) 
    real(kind=dp), dimension(:,:,:), allocatable :: photo_overlap
    !
-   ! Define some variables and arrays for processing input data from
+   ! Define some variables and arrays for processing input data from 
    ! photo_collect_input()
    !! integer, dimension(200)         :: select_level_i, select_level_f
    real(kind=dp), dimension(1000)   :: photo_energy_selection
@@ -189,14 +189,14 @@ contains
    function photo_alignment_parameter(g,keyword,tline)           result(A_2)
    !--------------------------------------------------------------------
    ! Returns the A_2 alignment parameter for the photoionization
-   ! line tline.
+   ! line tline. 
    !
    ! Calls: photo_kabachnik_B
    !--------------------------------------------------------------------
       !
       character(len=1), intent(in) :: g
       character(len=9), intent(in) :: keyword
-      type(photo_line), intent(in) :: tline
+      type(photo_line), intent(in) :: tline 
       complex(kind=dp)             :: A_2
       !
       A_2 = cmplx(zero,zero)
@@ -221,7 +221,7 @@ contains
    function photo_angular_parameter(g,keyword,tline)             result(beta)
    !--------------------------------------------------------------------
    ! Returns the beta angular distribution parameter for the photoionization
-   ! line tline. It uses the explicit expression in terms of the partial
+   ! line tline. It uses the explicit expression in terms of the partial 
    ! wave photoionization amplitudes as given by Huang, PRA 22 (1980) 223.
    !
    ! Calls: angular_momentum_j(), angular_momentum_l().
@@ -229,7 +229,7 @@ contains
       !
       character(len=1), intent(in) :: g
       character(len=4), intent(in) :: keyword
-      type(photo_line), intent(in) :: tline
+      type(photo_line), intent(in) :: tline 
       complex(kind=dp)             :: beta
       !
       integer                      :: i, ip, j, jp
@@ -306,14 +306,14 @@ contains
    function photo_C_factor(L,ip,i,tline)                     result(C)
    !--------------------------------------------------------------------
    ! Returns the C(L,kappa',kappa) factor for the photoionization
-   ! line tline. It uses the explicit expression in terms of the partial
+   ! line tline. It uses the explicit expression in terms of the partial 
    ! wave photoionization amplitudes as given by Huang, PRA 22 (1980) 223.
    !
    ! Calls: angular_momentum_j(), angular_momentum_l().
    !--------------------------------------------------------------------
       !
       integer, intent(in)          :: L, i, ip
-      type(photo_line), intent(in) :: tline
+      type(photo_line), intent(in) :: tline 
       complex(kind=dp)             :: C
       !
       integer                      :: j, jp
@@ -343,42 +343,35 @@ contains
    !
    subroutine photo_calculate_amplitudes()
    !--------------------------------------------------------------------
-   ! Calculates in turn the photoionization amplitudes for all channels and
-   ! photoionization lines .
-   !
-   ! Calls:
+   ! Calculates in turn the photoionization amplitudes for all channels and 
+   ! photoionization lines . 
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
+      !
       integer       :: i, j, n, nw, nu, nocsf
       real(kind=dp) :: energy
       type(nkappa)  :: subshell
       integer, dimension(:), allocatable :: ndx
-
-      ! Thread-private variables
-      integer, dimension(:), allocatable :: local_ndx_f, local_ndx_i
-      real(kind=dp), dimension(:,:), allocatable :: local_matrix
-
+      !
       logical           :: first = .true.
       integer           :: ii, ix
       real(kind=dp)     :: ri
       real(kind=dp), dimension(12000), save :: ta_kari
-
-      n = asf_final%csf_set%nocsf + asf_initial%csf_set%nocsf
-
-      ! Allocate global arrays outside parallel region
+      !
+      n = asf_final%csf_set%nocsf + asf_initial%csf_set%nocsf 
+      !
+      ! Allocate for a "first time"; it is first dellocated before any usage
       allocate( photo_csp%P(1:n_grasp2k), photo_csp%Q(1:n_grasp2k) )
       allocate( cowf_csp%P(1:10), cowf_csp%Q(1:10) )
       allocate( ndx(1:n) )
-
-      ! Parallelize the main loop over lines
-      !$OMP PARALLEL PRIVATE(i, j, energy, subshell, local_ndx_f, local_ndx_i, &
-      !$OMP                  local_matrix, nw, nocsf, ii, ix, ri) &
-      !$OMP          SHARED(ndx, photo_csp, cowf_csp, line, photo, asf_cont, &
-      !$OMP                 asf_final, asf_initial, first, ta_kari, n_grasp2k, &
-      !$OMP                 r_grasp2k)
-      !$OMP DO SCHEDULE(DYNAMIC)
-      do i = 1,number_of_lines
+      !
+      do  i = 1,number_of_lines
+         !!x print *, "***** line(i)%totalJ_f = ",line(i)%totalJ_f
+         !!x print *, "***** line(i)%totalJ_f = ",line(i)%totalJ_f
+         !!x print *, "***** line(i)%totalJ_f = ",line(i)%totalJ_f
+         !!x if (line(i)%e_energy < zero      .or.  line(i)%totalJ_f > 3  ) then
          if (line(i)%e_energy < zero) then
-            !$OMP CRITICAL
             line(i)%cs_babushkin  = zero
             line(i)%cs_coulomb    = zero
             line(i)%beta_b        = zero
@@ -391,110 +384,92 @@ contains
             line(i)%eta_c         = zero
             line(i)%zeta_b        = zero
             line(i)%zeta_c        = zero
-            !$OMP END CRITICAL
             cycle
          end if
-
-         do j = 1,line(i)%No_channels
-            !$OMP CRITICAL(write88)
-            write(88,*) "  "
-            write(88,2) &
-            "Transition: level_i, level_f, channel(kappa,J_tot,parity) = ", &
-            line(i)%level_i,line(i)%level_f,line(i)%channel(j)%kappa,       &
-            trim(angular_momentum_string(line(i)%channel(j)%totalJ,4)),     &
-            line(i)%channel(j)%parity
-            !$OMP END CRITICAL
-
+         !
+         do  j = 1,line(i)%No_channels
+	    write(88,*) "  "
+	    write(88,2) &
+	    "Transition: level_i, level_f, channel(kappa,J_tot,parity) = ",   &
+	    line(i)%level_i,line(i)%level_f,line(i)%channel(j)%kappa,         &
+	    trim(angular_momentum_string(line(i)%channel(j)%totalJ,4)),       &
+	    line(i)%channel(j)%parity
+	    !
+	  2 format(1x,a,2i5,3x,i4,2x,a4,a)
             energy = line(i)%e_energy
             call set_configuration_scheme(asf_final%csf_set,asf_cont%csf_set,&
                      -1,line(i)%channel(j)%kappa,                            &
                      line(i)%totalJ_f,line(i)%parity_f,                      &
                      line(i)%channel(j)%totalJ,line(i)%channel(j)%parity,    &
                      append=.false.,index=ndx)
-
-            ! Allocate thread-private arrays
+            !
             photo%No_f = asf_cont%csf_set%nocsf
-            allocate( local_ndx_f(photo%No_f) )
-            local_ndx_f(1:photo%No_f) = ndx(1:photo%No_f)
-
+            allocate( photo%ndx_f(photo%No_f) )
+            photo%ndx_f(1:photo%No_f) = ndx(1:photo%No_f)
+            !
             nw = asf_cont%csf_set%nwshells
-            if (rabs_use_stop .and. nw /= asf_final%csf_set%nwshells + 1) then
+            if (rabs_use_stop  .and. nw /= asf_final%csf_set%nwshells + 1) then
                stop "photo_calculate_amplitudes(): program stop A."
             end if
-
+            ! Calculate the MCP coefficients for the current coupling scheme
+            ! as well as the d_rs,  y_k(ab), and x_k(abcd) coefficients
             nocsf = asf_cont%csf_set%nocsf
             call anco_calculate_csf_matrix(asf_cont%csf_set,1,nocsf,1,nocsf)
             call cowf_set_drs_coefficients(line(i)%asff,asf_cont%csf_set,ndx)
             subshell = nkappa(-1,line(i)%channel(j)%kappa)
             call cowf_set_yk_coefficients(subshell,asf_cont%csf_set)
+            !!x print *, "photo_calculate_amplitudes - f"
             call cowf_set_xk_coefficients(subshell,asf_cont%csf_set)
-
-            ! Handle first-time radial grid output
-            !$OMP CRITICAL(first_output)
+            !!x print *, "photo_calculate_amplitudes - g"
+            !
+            !
             if (first) then
                first = .false.
                write(47,*) "Radial grid to define the additional potential"
                write(47,*) "----------------------------------------------"
                write(47,*) " "
-               do ix = 1,n_grasp2k/3
+               do  ix = 1,n_grasp2k/3
                   write(47,*) ix, r_grasp2k(ix)
                end do
             end if
-            !$OMP END CRITICAL
-
-            ! Set continuum orbital calculation parameters
+            !
+            ! Now iterate the continuum spinors for this channel
             cowf_start_homogeneous         = .true.
             cowf_phaseshift_wkb            = .true.
             cowf_phaseshift_zero_potential = .false.
             cowf_phaseshift_coulomb        = .false.
-            cowf_norm_nonrel              = .true.
+	    !
+	    cowf_norm_nonrel              = .true.
             call cowf_iterate_csp(energy,subshell)
-
-            !$OMP CRITICAL
+            !
             photo_csp = cowf_csp
             line(i)%channel(j)%phase = photo_csp%phase
-            !$OMP END CRITICAL
-
-            ! Define extended configuration scheme
+	    !
+            ! Define the 'extended' configuration scheme for calculating
+            ! the photoionization matrix and allocate memory
             call add_csf_to_basis(asf_initial%csf_set,asf_cont%csf_set,      &
-                    line(i)%totalJ_i,line(i)%parity_i,index=ndx)
+                     line(i)%totalJ_i,line(i)%parity_i,index=ndx)
             if (photo_print_csf_scheme) then
-               !$OMP CRITICAL(print_csf)
                call print_configuration_scheme(6,asf_cont%csf_set)
-               !$OMP END CRITICAL
             end if
-
+            !
             photo%No_i = asf_cont%csf_set%nocsf - photo%No_f
-            allocate( local_ndx_i(photo%No_i) )
-            local_ndx_i(1:photo%No_i) = ndx(1+photo%No_f:asf_cont%csf_set%nocsf)
-            allocate( local_matrix(1:photo%No_f,1:photo%No_i) )
-
-            call photo_pure_matrix(i,j,asf_cont%csf_set)
-
-            ! Move matrix results to shared storage
-            !$OMP CRITICAL(photo_matrix)
-            allocate( photo%ndx_f(photo%No_f) )
             allocate( photo%ndx_i(photo%No_i) )
+            photo%ndx_i(1:photo%No_i) = ndx(1+photo%No_f:asf_cont%csf_set%nocsf)
             allocate( photo%matrix(1:photo%No_f,1:photo%No_i) )
-            photo%ndx_f = local_ndx_f
-            photo%ndx_i = local_ndx_i
-            photo%matrix = local_matrix
+            !
+            call photo_pure_matrix(i,j,asf_cont%csf_set)
+            !
             call photo_channel_amplitude(i,j)
-            deallocate( photo%ndx_f, photo%ndx_i, photo%matrix )
-            !$OMP END CRITICAL
-
-            deallocate( local_ndx_f, local_ndx_i, local_matrix )
+            !
+            deallocate( photo%ndx_f, photo%ndx_i, photo%matrix  )
          end do
-
-         ! Calculate line properties
+         !
+         ! Calculates all selected properties for the selected transition
          call photo_line_properties(line(i))
       end do
-      !$OMP END DO
-      !$OMP END PARALLEL
-
       deallocate( ndx, photo_csp%P, photo_csp%Q)
-
-    2 format(1x,a,2i5,3x,i4,2x,a4,a)
+      !
    end subroutine photo_calculate_amplitudes
    !
    !
@@ -502,7 +477,7 @@ contains
    !--------------------------------------------------------------------
    ! Calculates the Bessel function j_L (w/c*r) over the radial grid
    ! r_grasp2k.
-   !
+   ! 
    ! Calls: spherical_Bessel_jL().
    !--------------------------------------------------------------------
       !
@@ -512,7 +487,7 @@ contains
       !
       integer :: i
       !
-      ! Calculate the Bessel function
+      ! Calculate the Bessel function 
       bessel(1) = zero
       do  i = 2,n_grasp2k
          bessel(i) = spherical_Bessel_jL(L,omega_over_c*r_grasp2k(i))
@@ -523,11 +498,11 @@ contains
    !
    subroutine photo_channel_amplitude(i,j)
    !--------------------------------------------------------------------
-   ! Calculates the Photoionization amplitude of channel j of line i
-   ! by summing over the 'pure' photoionization matrix using the proper
+   ! Calculates the Photoionization amplitude of channel j of line i 
+   ! by summing over the 'pure' photoionization matrix using the proper 
    ! weights of line i.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer, intent(in) :: i, j
@@ -622,7 +597,7 @@ contains
       maximal_energy = zero
       print *, "The photon energies can be entered either individually or by"
       print *, " an appropriate interval and step size."
-      print *, " The default is a list of individual energies; revise this ? "
+      print *, " The default is a list of individual energies; revise this ? " 
       yes = get_yes_stream()
       if (.not.yes) then
        4 print *, "Enter another (positive) photon energy in ",      &
@@ -665,7 +640,7 @@ contains
             end if
 	    energy = en_lower;   photo_energy_selection(1) = energy
 	    number_of_photo_energies = 1
-	    do
+	    do 
 	       energy = energy + delta_en
 	       if (energy > en_upper) exit
 	       number_of_photo_energies = number_of_photo_energies + 1
@@ -686,7 +661,7 @@ contains
       yes = get_yes_stream()
       if (.not.yes) goto 11
       !
-      ! Select individual pairs of transitions
+      ! Select individual pairs of transitions 
       call input_transition_pairs(number_of_atransitions)
       !
       print *, "Include exchange interactions into the generation of the"//&
@@ -734,7 +709,7 @@ contains
          if (ierr /= 0) goto 8
       end if
       !
-      print *, "Enter an (overall) shift for the atomic transition energies"//&
+      print *, "Enter an (overall) shift for the atomic transition energies"//& 
                " which applies to all transitions (in"//                      &
                trim(energy_unit)//"):"
       print *, " Use  0.  or   <cr>  if no shift need to be applied."
@@ -797,9 +772,9 @@ contains
    subroutine photo_initialize()
    !--------------------------------------------------------------------
    ! Initializes the computation of Auger rates, lifetimes, angular
-   ! distribution parameters and others.
-   !
-   ! Calls:
+   ! distribution parameters and others. 
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer :: i, mtp, noasf, nocsf, number_of_rwf
@@ -818,7 +793,7 @@ contains
          call photo_print_lines(24)
       end if
       !
-      ! Make a 'copy' of asf_final into asf_bound and wave_final into
+      ! Make a 'copy' of asf_final into asf_bound and wave_final into 
       ! wave_bound (kept in rabs_cowf) to use the COWF component
       noasf = asf_final%noasf;   nocsf = asf_final%csf_set%nocsf
       allocate( asf_bound%asf(1:noasf) )
@@ -851,7 +826,7 @@ contains
    !--------------------------------------------------------------------
       !
       character(len=1), intent(in) :: g
-      type(photo_line), intent(in) :: tline
+      type(photo_line), intent(in) :: tline 
       integer, intent(in)          :: k1,ki,kgamma
       complex(kind=dp)             :: B
       !
@@ -893,7 +868,7 @@ contains
 		       * wigner_6j_symbol(2,totalJ,J0,totalJp,2,kgamma+kgamma)&
 		       * wigner_9j_symbol(Jf,j,totalJ,Jf,jp,totalJp,          &
 		                          ki+ki,k1+k1,kgamma+kgamma)          &
-		       * tline%channel(i)%amplitude                           &
+		       * tline%channel(i)%amplitude                           & 
 		       * conjg(tline%channel(ip)%amplitude)
                   end if
                end do
@@ -929,7 +904,7 @@ contains
 		       * wigner_6j_symbol(2,totalJ,J0,totalJp,2,kgamma+kgamma)&
 		       * wigner_9j_symbol(Jf,j,totalJ,Jf,jp,totalJp,          &
 		                          ki+ki,k1+k1,kgamma+kgamma)          &
-		       * tline%channel(i)%amplitude                           &
+		       * tline%channel(i)%amplitude                           & 
 		       * conjg(tline%channel(ip)%amplitude)
                   end if
                end do
@@ -1003,7 +978,7 @@ contains
    !--------------------------------------------------------------------
       !
       integer, intent(in)          :: k1, k2, k0, k, k_gamma
-      type(photo_line), intent(in) :: tline
+      type(photo_line), intent(in) :: tline 
       complex(kind=dp)             :: B
       !
       integer                      :: i, ip, J0, J1, j, jp, l, lp, &
@@ -1016,7 +991,7 @@ contains
       ! Calculate the `factor' between the internal PI amplitudes and
       ! those amplitudes D_ljJ as used by NMK
       alpha  = one / one_over_alpha
-      factor = two * pi * alpha * tline%p_energy * sqrt(two * alpha)
+      factor = two * pi * alpha * tline%p_energy * sqrt(two * alpha) 
       !
       B = zero
       !
@@ -1056,12 +1031,12 @@ contains
    !
    subroutine photo_line_properties(tline)
    !--------------------------------------------------------------------
-   ! Calculates all selected photoionization properties of line i from
-   ! the amplitudes of the individual photoionization channels. This
-   ! concerns the total cross sections as well as angular distribution and
+   ! Calculates all selected photoionization properties of line i from 
+   ! the amplitudes of the individual photoionization channels. This 
+   ! concerns the total cross sections as well as angular distribution and 
    ! spin polarization parameters.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       type(photo_line), intent(inout) :: tline
@@ -1117,7 +1092,7 @@ contains
                          trim(angular_momentum_string(tline%totalJ_i)),  &
                          " ",tline%parity_i,"   ----> ",                 &
                          trim(angular_momentum_string(tline%totalJ_f)),  &
-                         " ",tline%parity_f
+                         " ",tline%parity_f               
          write(stream,*) " --------------------------------------------"//  &
                          "------------------------------------"
          write(stream,*) " "
@@ -1169,7 +1144,7 @@ contains
                           conjg(tline%channel(j)%amplitude)* photo_cs_factor
             write(stream,2) orbital_symmetry(tline%channel(j)%kappa),        &
                     trim(angular_momentum_string(tline%channel(j)%totalJ,4)),&
-                            tline%channel(j)%parity,                         &
+                            tline%channel(j)%parity,                         & 
                             tline%channel(j)%multipole,                      &
                             tline%channel(j)%gauge(1:9),                     &
                             tline%channel(j)%amplitude,                      &
@@ -1192,11 +1167,11 @@ contains
       end if
       !
    end subroutine photo_line_properties
-   !
+   !  
    !
    subroutine photo_print_amplitudes(stream)
    !--------------------------------------------------------------------
-   ! Prints the information about all (selected) transitions and amplitudes
+   ! Prints the information about all (selected) transitions and amplitudes 
    ! to a (.chn) channel amplitude file on stream.
    !
    !--------------------------------------------------------------------
@@ -1227,9 +1202,9 @@ contains
       write(stream,*) " "
       !
       do  i = 1,number_of_lines
-         do  j = 1,line(i)%No_channels
+         do  j = 1,line(i)%No_channels 
 	    wa = abs(line(i)%channel(j)%amplitude)
-	    wa = wa*wa
+	    wa = wa*wa  
             write(stream,1) line(i)%asfi,line(i)%asff,               &
                             line(i)%level_i,line(i)%level_f,         &
                             line(i)%totalJ_i,line(i)%totalJ_f,       &
@@ -1254,9 +1229,9 @@ contains
    !
    subroutine photo_print_lines(stream)
    !--------------------------------------------------------------------
-   ! Prints a neat table of all selected 'photon' or 'electron' lines
-   ! on stream before the actual computation starts; only the quantum
-   ! numbers of the atomic states and the transition energies are
+   ! Prints a neat table of all selected 'photon' or 'electron' lines 
+   ! on stream before the actual computation starts; only the quantum 
+   ! numbers of the atomic states and the transition energies are 
    ! displayed.
    !
    ! Calls: angular_momentum_string(), get_kappa_channels().
@@ -1287,11 +1262,11 @@ contains
                    trim(angular_momentum_string(line(i)%channel(j)%totalJ,4)),&
                    line(i)%channel(j)%parity,j=1,line(i)%No_channels)
       end do
-      write(stream,3)
+      write(stream,3) 
     1 format(/,"The following ",i5," lines are selected:",                 &
         //,"     I-level-F     I--J^P--F        Photon Energy    Electron",&
            " energy      Photoionization channels",                        &
-         /,"                                     (in ",a4,")  ",           &
+         /,"                                     (in ",a4,")  ",           &  
          /,4x,133("-") )
     2 format(4x,i4," -",i4,3x,a4,a1,3x,a4,a1,5x,1pe14.7,5x,1pe14.7,6x,     &
                    4(a2,"(",a2,";",a1,") J=",a,a1,3x), &
@@ -1357,7 +1332,7 @@ contains
    !
    subroutine photo_print_results(stream)
    !--------------------------------------------------------------------
-   ! Writes the photoionization cross sections and angular distribution
+   ! Writes the photoionization cross sections and angular distribution 
    ! parameters, and further properties in a neat summary to the .sum file.
    !
    ! Calls:  angular_momentum_string().
@@ -1381,7 +1356,7 @@ contains
                    "  CS-Coulomb   Total Babushkin   Total Coulomb    ",                &
               / 2x,"                                  ",                                &
                    "  (",a,")             (",a,")           (a.u.)    ",                &
-                   "      (a.u.)          (a.u.)          (a.u.) "   ,                  &
+                   "      (a.u.)          (a.u.)          (a.u.) "   ,                  &                        
               / 1x,128("-") )
     3 format( / 1x,128("-"),                                                            &
               / 2x,"LevI-LevF   I- J / Parity -F      ",                                &
@@ -1389,7 +1364,7 @@ contains
                    "  CS-Coulomb   Ratio Babushkin   Ratio Coulomb    ",                &
               / 2x,"                                  ",                                &
                    "  (",a,")             (",a,")            (",a,")     ",             &
-                   "       (",a,")            (",a,")            (",a,") "   ,          &
+                   "       (",a,")            (",a,")            (",a,") "   ,          &                        
               / 1x,128("-") )
     4 format(   2x,i3,' -',i3,3x,a4,a2,4x,a4,a2,5x,2(1pe12.5,5x),                       &
                    4(1pe10.3,6x),     8x,1pe10.3,2x,1pe10.3 )
@@ -1429,8 +1404,8 @@ contains
       !
       csc_tot = zero;   csb_tot = zero
       do  i = 1,number_of_lines
-         csb_tot = csb_tot + line(i)%cs_babushkin
-         csc_tot = csc_tot + line(i)%cs_coulomb
+         csb_tot = csb_tot + line(i)%cs_babushkin 
+         csc_tot = csc_tot + line(i)%cs_coulomb 
       end do
       !
        ratio_b = zero;  ratio_c = zero;  total_B = zero; total_C=zero;
@@ -1445,26 +1420,26 @@ contains
          csb      = line(i)%cs_babushkin * photo_cs_factor
          csc      = line(i)%cs_coulomb   * photo_cs_factor
          !
-         ratio_b = csb/(csb_tot * photo_cs_factor)
+         ratio_b = csb/(csb_tot * photo_cs_factor) 
          ratio_c = csc/(csc_tot * photo_cs_factor)
          total_B = total_B + ratio_b
          total_C = total_C + ratio_c
        !
        !  photo_print_only_gt_1percent                          &
-         if(abs(ratio_b) > photo_print_cut) then
+         if(abs(ratio_b) > photo_print_cut) then 
            write(stream,4) line(i)%level_i, line(i)%level_f,   &
                   trim(angular_momentum_string(line(i)%totalJ_i,4)),  &
                             line(i)%parity_i,                         &
                   trim(angular_momentum_string(line(i)%totalJ_f,4)),  &
                             line(i)%parity_f,                         &
                             p_energy,e_energy,csb,csc,ratio_b,ratio_c
-         end if
+         end if                              
       end do
       write(stream,9)
       write(stream,*) "Selected total B-cross section ratio= ", total_B
       write(stream,*) "Total Babushkin-cross section (Mb)= ", csb_tot*photo_cs_factor
       write(stream,*) "Selected total C-cross section ratio= ", total_C
-      write(stream,*) "Total Coulomb-cross section (Mb)= ", csc_tot*photo_cs_factor
+      write(stream,*) "Total Coulomb-cross section (Mb)= ", csc_tot*photo_cs_factor       
 
       !
       ! Print photoionization angular parameters
@@ -1518,9 +1493,9 @@ contains
          write(stream,11)
          write(stream,*) " "
       end if
+      ! 
       !
-      !
-      ! Print photoionization spin-polarization parameters
+      ! Print photoionization spin-polarization parameters 
       !
       if (photo_calc_spin_polarization) then
          write(stream,*) " "
@@ -1620,14 +1595,14 @@ contains
    ! and the following no_f+1,...,no_f+no_i to the initial states.
    ! The procedure takes into account ...
    !
-   ! Calls:
+   ! Calls:  
    !--------------------------------------------------------------------
       !
       integer, intent(in)	  :: tr, ch
       type(csf_basis), intent(in) :: csf_set
       !
       integer			  :: i, ia, ib, j, ja, jb, no_T_coeff, r, s, &
-				     ss, t, nu, par, parity, ii
+				     ss, t, nu, par, parity, ii	  
       type(nkappa)		  :: aa, bb, cc, dd
       real(kind=dp)		  :: aweight, wy
       type(nkappa)                :: Ta, Tb
@@ -1655,7 +1630,6 @@ contains
          call nonorth_initialize_ci(csf_set,wave_final,wave_initial,photo_csp)
       end if
       !
-      !$OMP PARALLEL DO PRIVATE(r, s, ss, t) SCHEDULE(STATIC)
       do  r = 1,photo%No_f
          do  s = photo%No_f+1,photo%No_f+photo%No_i
             ss = s - photo%No_f
@@ -1753,7 +1727,6 @@ contains
             end do
          end do
       end do
-      !$OMP END PARALLEL DO
       !
       if (photo_nonorthogonal_eval) then
          call nonorth_finalize("ci")
@@ -1762,7 +1735,7 @@ contains
       !
    end subroutine photo_pure_matrix
    !
-   !
+   ! 
    function photo_reduced_M_integral(tr,multipole,gauge,rwf_f,rwf_i) &
                                                           result(red_me)
    !--------------------------------------------------------------------
@@ -1837,7 +1810,7 @@ contains
       select case(multipole)
       case("M1", "M2", "M3", "M4")
          ta(1) = zero
-         ta(2:mtp) = ( rwf_f%P(2:mtp)*rwf_i%Q(2:mtp) +                   &
+         ta(2:mtp) = ( rwf_f%P(2:mtp)*rwf_i%Q(2:mtp) +                   & 
                        rwf_f%Q(2:mtp)*rwf_i%P(2:mtp) ) * rp_grasp2k(2:mtp)
          select case(multipole)
          case("M1")
@@ -1853,7 +1826,7 @@ contains
          red_me = factor * red_me
       case("E1", "E2", "E3", "E4")
          ta(1) = zero
-         !
+         ! 
          wa    = sqrt(L/(L+one))*(kapa-kapb);  wb = sqrt(L/(L+one))*(L+one)
          ta(2:mtp) = wa * (rwf_f%P(2:mtp)*rwf_i%Q(2:mtp) +        &
                            rwf_f%Q(2:mtp)*rwf_i%P(2:mtp) )        &
@@ -1894,7 +1867,7 @@ contains
             red_me = red_Coulomb
             if (.false.) &
                write(99,*) "factor, red_Coulomb = ",factor, red_me
-            deallocate( ta )
+            deallocate( ta ) 
             return
          else if (gauge == "Babushkin") then
          else if (rabs_use_stop) then
@@ -1937,7 +1910,7 @@ contains
          end select
          red_Gauge = red_Gauge + factor * sqrt((L+one)/L) * quad_grasp2k(ta,mtp)
          !
-	 ! Sign due to K.G. Dyall et al., CPC (1989), used original and
+	 ! Sign due to K.G. Dyall et al., CPC (1989), used original and 
 	 ! up to august 2007
 	 !
          wa    = -(L+L+one)
@@ -1973,7 +1946,7 @@ contains
          stop "photo_reduced_M_integral(): program stop C."
       end select
       !
-      deallocate( ta )
+      deallocate( ta ) 
       !
       if (.true.) then
          write (88,2) orbital_name(rwf_f%orbital%n,rwf_f%orbital%kappa),     &
@@ -1987,15 +1960,15 @@ contains
    !
    subroutine photo_set_lines()
    !--------------------------------------------------------------------
-   ! Determines how many and which photoionization lines need to be
+   ! Determines how many and which photoionization lines need to be 
    ! calculated and initializes the array line of type(photo_lines).
    ! The default is (for number_of_lines == 0) that all lines
    ! with a positive electron energy are calculated; for number_of_lines /= 0,
-   ! lines for individual atomic transitions were selected during input time
+   ! lines for individual atomic transitions were selected during input time 
    ! and will be initialized instead; in this case also negative line energies
    ! are allowed and may be overritten by appropriate experimental energies.
    !
-   ! Calls:
+   ! Calls: 
    !--------------------------------------------------------------------
       !
       integer       :: asfi, asff, i, imin, j, k, l, m, nchannels, nt, nch, &
@@ -2095,9 +2068,9 @@ contains
          ask_for = .false.
          !
          do k = 1,nt
-            if (.not.ask_for(k)) then
+            if (.not.ask_for(k)) then 
                i = line(k)%asfi;   j = line(k)%asff
-               energy  = asf_initial%asf(i)%energy - asf_final%asf(j)%energy
+               energy  = asf_initial%asf(i)%energy - asf_final%asf(j)%energy 
                if (energy_inverse) then
                   energy = energy_factor / energy
                else
@@ -2204,7 +2177,7 @@ contains
                   !
                   ! Determine the number of channels
                   do  m = 1,nchannels
-		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle
+		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle 
                      if (abs(kappa_channel(m)) <= photo_maximal_kappa) then
                         nch = nch + 1
                         wa_kappa(nch)     = kappa_channel(m)
@@ -2240,7 +2213,7 @@ contains
                   !
                   ! Determine the number of channels
                   do  m = 1,nchannels
-		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle
+		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle 
                      if (abs(kappa_channel(m)) <= photo_maximal_kappa) then
                         nch = nch + 1
                         wa_kappa(nch)     = kappa_channel(m)
@@ -2270,7 +2243,7 @@ contains
                   !
                   ! Determine the number of channels
                   do  m = 1,nchannels
-		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle
+		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle 
                      if (abs(kappa_channel(m)) <= photo_maximal_kappa) then
                         nch = nch + 1
                         wa_kappa(nch)     = kappa_channel(m)
@@ -2306,7 +2279,7 @@ contains
                   !
                   ! Determine the number of channels
                   do  m = 1,nchannels
-		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle
+		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle 
                      if (abs(kappa_channel(m)) <= photo_maximal_kappa) then
                         nch = nch + 1
                         wa_kappa(nch)     = kappa_channel(m)
@@ -2335,7 +2308,7 @@ contains
                   !
                   ! Determine the number of channels
                   do  m = 1,nchannels
-		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle
+		     if (line(nt)%totalJ_i == 0  .and.  totalJ == 0) cycle 
                      if (abs(kappa_channel(m)) <= photo_maximal_kappa) then
                         nch = nch + 1
                         wa_kappa(nch)     = kappa_channel(m)
@@ -2370,7 +2343,7 @@ contains
          !
          ! Calculate the Bessel function for the given transition
          ! energy; first allocate the array
-         yes0 = .false.;   yes1 = .false.    ! yes == Needs to be
+         yes0 = .false.;   yes1 = .false.    ! yes == Needs to be 
          yes2 = .false.;   yes3 = .false.    !        calculated ?
          yes4 = .false.;   yes5 = .false.
          do  m = 1,nch
@@ -2482,7 +2455,7 @@ contains
    function photo_spin_parameter(g,keyword,tline)             result(wa)
    !--------------------------------------------------------------------
    ! Returns the spin angular parameters for the photoionization
-   ! line tline. It uses the explicit expression in terms of the partial
+   ! line tline. It uses the explicit expression in terms of the partial 
    ! wave photoionization amplitudes as given by Huang, PRA 22 (1980) 223.
    !
    ! Calls: angular_momentum_j(), angular_momentum_l().
@@ -2490,7 +2463,7 @@ contains
       !
       character(len=1), intent(in) :: g
       character(len=4), intent(in) :: keyword
-      type(photo_line)             :: tline
+      type(photo_line)             :: tline 
       complex(kind=dp)             :: wa
       !
       integer                      :: i, ip, j, jp, lp

@@ -13,7 +13,7 @@ OBJ = xphoto.o  rabs_anco.o  rabs_angular.o  rabs_cesd.o  rabs_constant.o  \
 #  Recompile xauger
 #
 xphoto :  $(OBJ)
-	  $(FCP) $(OBJ) -O  -o xphoto $(LIB) $(LLP)
+	  $(FCP) $(OBJ) -O -o xphoto $(LIB) $(LLP)
 
 xphoto.o :                xphoto.f90  rabs_constant.o  rabs_csl.o \
                           rabs_file_handling.o  rabs_grasp2k.o  rabs_photo.o

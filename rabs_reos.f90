@@ -3,9 +3,9 @@ module rabs_reos
 !***** July 2010 *****
 !-----------------------------------------------------------------------
 ! This module contains all procedures which are specific to the REOS
-! program. This includes the calculation of the one-particle reduced
+! program. This includes the calculation of the one-particle reduced 
 ! matrix elements but also several procedures for file handling and the
-! intermediate storage of several quantities to accelerate the
+! intermediate storage of several quantities to accelerate the 
 ! computations.
 !-----------------------------------------------------------------------
    !
@@ -18,51 +18,50 @@ module rabs_reos
    use rabs_grasp2k
    use rabs_input_dialog
    use rabs_nucleus
-   use omp_lib
    implicit none
    !
    public  :: reos_test_initial
-                 ! Opens a .xpn file for the initial states and reads in all
+                 ! Opens a .xpn file for the initial states and reads in all 
 		 ! necessary data from this file.
    private :: reos_amplitude_different_MM
-                 ! Calculates the multipole amplitudes for the case that
+                 ! Calculates the multipole amplitudes for the case that 
 		 ! Slater determinants with different M-projection occur.
    private :: reos_amplitude_same_MM
-                 ! Calculates the multipole amplitudes for the case that
+                 ! Calculates the multipole amplitudes for the case that 
 		 ! Slater determinants with the same M-projection occur.
    private :: reos_calculate_Bessel
                  ! Calculates the Bessel function over the radial grid
                  ! for a given factor.
    public  :: reos_calculate_amplitudes
-                 ! Initializes the computation of transition probabilities
+                 ! Initializes the computation of transition probabilities 
                  ! and lifetimes and calculates the transition amplitudes for
                  ! all transitions; several computational modes are supported.
    private :: reos_calculate_me
-                 ! Calculates the contributions of the one-particle multipole
-                 ! operators for all defined transitions for a given pair of
-                 ! Slater determinants.
+                 ! Calculates the contributions of the one-particle multipole 
+                 ! operators for all defined transitions for a given pair of 
+                 ! Slater determinants.            
    private :: reos_calculate_me_orth
-                 ! Calculates the contributions of the one-particle multipole
-                 ! operators for a given pair of determinants by assuming
-                 ! orthogonal orbital sets for the initial and final states.
+                 ! Calculates the contributions of the one-particle multipole 
+                 ! operators for a given pair of determinants by assuming 
+                 ! orthogonal orbital sets for the initial and final states.           
    public  :: reos_collect_input
                  ! Collects and proceeds all input for the expansion of the
                  ! symmetry-adapted functions into determinants.
    private :: reos_convert_probability
-                 ! Returns the oscillator strength, the Einstein A and B
-                 ! coefficients, and the decay width for a given transition
+                 ! Returns the oscillator strength, the Einstein A and B 
+                 ! coefficients, and the decay width for a given transition 
                  ! amplitude.
    public  :: reos_initialize_rwf_storage
-   		 ! Initializes the arrays of type(grasp2k_orbital) for the
+   		 ! Initializes the arrays of type(grasp2k_orbital) for the 
    		 ! storage of the radial wave functions.
    private :: reos_load_trn_file
 		 ! Opens a .trn  transition amplitude file and reads in data
 		 ! for all individual transitions.
    private :: reos_open_restart
-                 ! Opens the two .res restart files for restarting the REOS
+                 ! Opens the two .res restart files for restarting the REOS 
                  ! from a previously aborted run on stream 31 and 32.
    public  :: reos_print_results
-                 ! Writes the transition probabilities and lifetimes to
+                 ! Writes the transition probabilities and lifetimes to 
                  ! the .sum file.
    public  :: reos_print_summary
 		 ! Appends a summary of the input data to the .sum file.
@@ -82,7 +81,7 @@ module rabs_reos
                  ! Determines a list of multipole line components which
                  ! contribute and are considered for a given transition.
    private :: reos_set_determinant_sym
-                 ! Allocates storage and 'initializes' information about the
+                 ! Allocates storage and 'initializes' information about the 
                  ! symmetry blocks of each determinant to accelerate the
                  ! computations.
    private :: reos_set_overlaps
@@ -111,9 +110,9 @@ module rabs_reos
    ! Define an internal structure type(reos_transition) which stores all
    ! necessary information for an radiative transition line
    type :: multipole_line
-      character(len=2) :: multipole
-      character(len=9) :: gauge
-      real(kind=dp)    :: amplitude
+      character(len=2) :: multipole  
+      character(len=9) :: gauge 
+      real(kind=dp)    :: amplitude   
       real(kind=dp), dimension(:,:,:,:), pointer :: radial_int
    end type multipole_line
    !
@@ -146,7 +145,7 @@ module rabs_reos
    real(kind=dp) :: reos_determinant_cutoff   = 1.0e-8_dp
    !
    ! Define global logical flags for the control of the REOS program; the
-   ! default values for these flags may be overwritten interactively during
+   ! default values for these flags may be overwritten interactively during 
    ! input time
    logical, public :: reos_use_compact_xpn_file      = .false.,  &
                       reos_apply_exp_energies        = .false.,  &
@@ -160,13 +159,13 @@ module rabs_reos
                       reos_use_formatted_rwf_file    = .true.,   &
                       reos_write_transition_file     = .false.
    !
-   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i)
+   ! Define storage for the overlap integrals: (kappa,pqn_f,pqn_i) 
    real(kind=dp), dimension(:,:,:), allocatable :: reos_overlap
    !
    ! Define storage for symmetries of the determinants;
    ! reos_detsym(determinant_index,symmetry_index) where symmetry_index if
    ! found in sym_block(kappa,mm); the present version therefore only
-   ! allows symmetries with |kappa| <= 7
+   ! allows symmetries with |kappa| <= 7 
    integer, dimension(-19:19,-37:37) :: sym_block  = 0
    !!x integer, dimension(-7:7,-13:13) :: sym_block  = 0
    integer(kind=i1b), dimension(:,:), allocatable ::                    &
@@ -175,7 +174,7 @@ module rabs_reos
    ! Define logical flags for debugging individual procedures
    logical, private :: debug_reduced_M_integral       = .false.
    !
-   ! Define some variables and arrays for processing input data from
+   ! Define some variables and arrays for processing input data from 
    ! reos_collect_input()
    character(len=2), dimension(20) :: reos_multipole  = "  "
    !
@@ -183,7 +182,7 @@ contains
    !
    subroutine reos_test_initial()
    !--------------------------------------------------------------------
-   ! Opens a .xpn file for the initial states and reads in all necessary
+   ! Opens a .xpn file for the initial states and reads in all necessary 
    ! data from this file. It also close the file finally.
    !
    ! Calls: file_open(), reos_load_xpn_file().
@@ -213,8 +212,8 @@ contains
       print *, "a"
       !
       ! Load data from the  .xpn-old  file
-      read(21,*);   read(21,*);   read(21,*);    read(21,*)
-      read(21,*) asf_test%noasf
+      read(21,*);   read(21,*);   read(21,*);    read(21,*) 
+      read(21,*) asf_test%noasf 
       allocate( asf_test%asf(1:asf_test%noasf) )
       print *, "b"
       read(21,*) asf_test%det_set%norbital
@@ -245,7 +244,7 @@ contains
                               noint,occupation,asf_test%det_set%norbital)
       end do
       !
-      read(21,*);   read(21,*);   read(21,*);    read(21,*)
+      read(21,*);   read(21,*);   read(21,*);    read(21,*) 
       read(21,*) asf_test%average_energy
       read(21,*);   read(21,*);   read(21,*)
       if (asf_test%noasf > 8) asf_test%noasf = 8
@@ -256,7 +255,7 @@ contains
       read(21,*) (asf_test%asf(i)%totalJ,i=1,asf_test%noasf)
       asf_test%asf(1:asf_test%noasf)%totalJ  = &
          asf_test%asf(1:asf_test%noasf)%totalJ - 1
-      read(21,*)
+      read(21,*)          
       read(21,*) (iparity(i),i=1,asf_test%noasf)
       do  i = 1,asf_test%noasf
          if (iparity(i) == 1) then
@@ -320,8 +319,8 @@ contains
                         asf_initial%asf(i)%eigenvector(ia) - &
                         asf_test%asf(i)%eigenvector(ib)
                end if
-            end do
-            cycle ialoop
+            end do 
+            cycle ialoop      
          end do ibloop
          print *, "*****WARNING******ia, ib = ", ia, ib
       end do ialoop
@@ -331,13 +330,14 @@ contains
    !
    subroutine reos_amplitude_different_MM()
    !--------------------------------------------------------------------
-   ! Calculates the multipole amplitudes for the case that Slater
+   ! Calculates the multipole amplitudes for the case that Slater 
    ! determinants with different M-projection occurs in the wave function
    ! expansion. This often occurs for the calculation of transition
    ! probabilities between different multipletts.
-   !
-   ! Calls:
+   ! 
+   ! Calls: 
    !--------------------------------------------------------------------
+      !
       integer :: diff_symmetry, i, ia, j, ki, kf, nocc_i, nocc_f,                  &
                  MM_i, MM_f, MM_photon, norb_i, norb_f, rank,                  &
                  reos_pair_billion, reos_pair_counter, reos_calc_billion,      &
@@ -346,12 +346,8 @@ contains
                                               occupation_i, occupation_f
       real(kind=dp) :: geom_factor, wa, total
       type(nkappam), dimension(:), allocatable :: orbital_i, orbital_f
-
-      ! Thread-private variables for parallel region
-      integer :: local_reos_calc_billion, local_reos_calc_counter, &
-                 local_reos_neglect_billion, local_reos_neglect_counter
-
-      ! Allocate storage for working arrays outside parallel region
+      !
+      ! Allocate storage for some working arrays
       nocc_f = asf_final%det_set%noint * &
                bit_size(asf_final%det_set%determinant(1)%occupation(1))
       nocc_i = asf_initial%det_set%noint * &
@@ -361,209 +357,155 @@ contains
                 detsym_i(number_of_symmetry_blocks),                    &
                 orbital_i(1:asf_initial%det_set%number_of_electrons),   &
                 orbital_f(1:asf_final%det_set%number_of_electrons) )
-
-      ! Initialize global counters
+      !
+      ! Now cycle over all pairs of final- and initial-state determinants 
+      ! Use separate routine if initial- and final-state orbitals are
+      ! assumed to be orthogonal
       reos_dump_billion    = 0;   reos_dump_counter    = 0
       reos_pair_billion    = 0;   reos_pair_counter    = 1
       reos_calc_billion    = 0;   reos_calc_counter    = 0
       reos_neglect_billion = 0;   reos_neglect_counter = 0
-
-      total = (asf_final%det_set%nod+zero) * asf_initial%det_set%nod * &
+      !
+      total = (asf_final%det_set%nod+zero) * asf_initial%det_set%nod *    &
               number_of_transitions
       print *, "Less than ",total," matrix elements between final- and"// &
                " initial-state determinants need to be calculated."
       print *, " This includes zero contributions due to different"//     &
                " M projections in the expansion of the wavefunctions."
-
-      ! Parallelize the outer loop over transitions
-      !$OMP PARALLEL PRIVATE(i, kf, ki, j, wa, MM_f, MM_i, MM_photon, &
-      !$OMP                  diff_symmetry, norb_i, norb_f, detsym_i, detsym_f, &
-      !$OMP                  occupation_i, occupation_f, orbital_i, orbital_f, &
-      !$OMP                  local_reos_calc_billion, local_reos_calc_counter, &
-      !$OMP                  local_reos_neglect_billion, local_reos_neglect_counter, &
-      !$OMP                  ia) &
-      !$OMP          SHARED(reos_dump_billion, reos_dump_counter, &
-      !$OMP                  reos_pair_billion, reos_pair_counter, &
-      !$OMP                  reos_calc_billion, reos_calc_counter, &
-      !$OMP                  reos_neglect_billion, reos_neglect_counter, &
-      !$OMP                  asf_final, asf_initial, transition)
-      ! Initialize thread-local counters
-      local_reos_calc_billion    = 0
-      local_reos_calc_counter    = 0
-      local_reos_neglect_billion = 0
-      local_reos_neglect_counter = 0
-
-      !$OMP DO SCHEDULE(DYNAMIC)
-      do i = 1, number_of_transitions
-         ! Determine M projections for this transition
-         MM_f = -999
-         do kf = 1, asf_final%det_set%nod
+      !
+      do  i  = 1,number_of_transitions
+         ! Determine the M projections of the initial and final-state
+         ! wave functions of the particular transition; make sure that
+         ! they are the same for all (contributing) determinants
+         do  kf = 1,asf_final%det_set%nod
             if (asf_final%asf(transition(i)%asff)%eigenvector(kf) /= zero) then
-               MM_f = asf_final%det_set%determinant(kf)%totalM
-               exit
+               MM_f = asf_final%det_set%determinant(kf)%totalM;   exit
             end if
          end do
-         do kf = 1, asf_final%det_set%nod
-            if (asf_final%asf(transition(i)%asff)%eigenvector(kf) /= zero .and. &
-                asf_final%det_set%determinant(kf)%totalM /= MM_f) then
+         do  kf = 1,asf_final%det_set%nod
+            if (asf_final%asf(transition(i)%asff)%eigenvector(kf) /= zero     &
+                .and.    asf_final%det_set%determinant(kf)%totalM /= MM_f) then
                stop "reos_amplitude_different_MM(): program stop A."
             end if
          end do
-
-         MM_i = -999
-         do ki = 1, asf_initial%det_set%nod
-            if (asf_initial%asf(transition(i)%asfi)%eigenvector(ki) /= zero) then
-               MM_i = asf_initial%det_set%determinant(ki)%totalM
-               exit
+         !
+         do  ki = 1,asf_initial%det_set%nod
+            if (asf_initial%asf(transition(i)%asfi)%eigenvector(ki)/=zero) then
+               MM_i = asf_initial%det_set%determinant(ki)%totalM;   exit
             end if
          end do
-         do ki = 1, asf_initial%det_set%nod
-            if (asf_initial%asf(transition(i)%asfi)%eigenvector(ki) /= zero .and. &
-                asf_initial%det_set%determinant(ki)%totalM /= MM_i) then
+         do  ki = 1,asf_initial%det_set%nod
+            if (asf_initial%asf(transition(i)%asfi)%eigenvector(ki) /= zero   &
+                .and.  asf_initial%det_set%determinant(ki)%totalM /= MM_i) then
                stop "reos_amplitude_different_MM(): program stop B."
             end if
          end do
          MM_photon = MM_f - MM_i
-
-         ! Nested loop over determinants for this transition
-         do kf = 1, asf_final%det_set%nod
-            do ki = 1, asf_initial%det_set%nod
-               ! Update pair counters atomically
-               !$OMP ATOMIC
-               reos_pair_counter = reos_pair_counter + 1
-               if (reos_pair_counter >= 1000000000) then
-                  !$OMP CRITICAL(pair_billion)
-                  reos_pair_billion = reos_pair_billion + 1
-                  reos_pair_counter = 0
-                  !$OMP END CRITICAL
-               end if
-
-               !$OMP ATOMIC
-               reos_dump_counter = reos_dump_counter + 1
-               if (reos_dump_counter >= 1000000000) then
-                  !$OMP CRITICAL(dump_billion)
-                  reos_dump_billion = reos_dump_billion + 1
-                  reos_dump_counter = 0
-                  !$OMP END CRITICAL
-               end if
-
-               ! Periodic status output
-               if (mod(reos_pair_counter, reos_determinant_counter) == 0) then
-                  !$OMP CRITICAL(print_status)
-                  print *, "  ",reos_calc_billion,"billion",reos_calc_counter, &
-                           "pairs calculated;",reos_neglect_billion,"billion", &
-                           reos_neglect_counter,"neglected or zero contribution;", &
-                           reos_pair_billion,"billion",reos_pair_counter,"in total;"
-                  !$OMP END CRITICAL
-               end if
-
-               ! Skip if restarting and pair already processed
-               if (reos_apply_restart) then
-                  if (reos_dump_billion < reos_dump_billion_done .or. &
-                      (reos_dump_billion == reos_dump_billion_done .and. &
-                       reos_dump_counter < reos_dump_counter_done)) cycle
-               end if
-
-               ! Dump transition information
-               if (reos_enable_restart .and. &
-                   mod(reos_dump_counter, reos_dump_period) == 0) then
-                  !$OMP CRITICAL(dump_transitions)
-                  rewind (32)
-                  call reos_readwrite_transitions(32, .false.)
-                  rewind (32)
-                  print *, "dump transitions after ",reos_dump_billion, &
-                           " billion and ",reos_dump_counter," pairs on stream 32."
-                  !$OMP END CRITICAL
-               end if
-
-               ! Check weight threshold
-               wa = asf_final%asf(transition(i)%asff)%eigenvector(kf) * &
-                    asf_initial%asf(transition(i)%asfi)%eigenvector(ki)
-               if (abs(wa) < reos_determinant_cutoff) then
-                  local_reos_neglect_counter = local_reos_neglect_counter + 1
-                  if (local_reos_neglect_counter >= 1000000000) then
-                     local_reos_neglect_billion = local_reos_neglect_billion + 1
-                     local_reos_neglect_counter = 0
+         !
+         do kf = 1,asf_final%det_set%nod
+            do  ki = 1,asf_initial%det_set%nod
+               wa   = asf_final%asf(transition(i)%asff)%eigenvector(kf) * &
+                      asf_initial%asf(transition(i)%asfi)%eigenvector(ki)
+               if (abs(wa) < reos_determinant_cutoff) then 
+                  reos_neglect_counter = reos_neglect_counter + 1
+                  if (reos_neglect_counter == 1000000000) then
+                     reos_neglect_billion  = reos_neglect_billion + 1
+                     reos_neglect_counter  = 0
                   end if
+                  ! print *, "wa - upper = ",wa
                   cycle
                else
-                  local_reos_calc_counter = local_reos_calc_counter + 1
-                  if (local_reos_calc_counter >= 1000000000) then
-                     local_reos_calc_billion = local_reos_calc_billion + 1
-                     local_reos_calc_counter = 0
+                  reos_calc_counter = reos_calc_counter + 1
+                  if (reos_calc_counter == 1000000000) then
+                     reos_calc_billion  = reos_calc_billion + 1
+                     reos_calc_counter  = 0
                   end if
                end if
-
-               ! Symmetry check
+               !
+               if (mod(reos_pair_counter,reos_determinant_counter) == 0) then
+               print *, "  ",reos_calc_billion,"billion",reos_calc_counter, &
+                  "pairs calculated;",reos_neglect_billion,"billion",       &
+                  reos_neglect_counter,"neglected or zero contribution;",   &
+                  reos_pair_billion,"billion",reos_pair_counter,"in total;"       
+               end if
+               reos_pair_counter = reos_pair_counter + 1
+               if (reos_pair_counter == 1000000000) then
+                  reos_pair_billion  = reos_pair_billion + 1
+                  reos_pair_counter  = 0
+               end if
+               reos_dump_counter = reos_dump_counter + 1
+               if (reos_dump_counter == 1000000000) then
+                  reos_dump_billion  = reos_dump_billion + 1
+                  reos_dump_counter  = 0
+               end if
+	       !
+	       if (reos_apply_restart) then
+	          if (reos_dump_billion <  reos_dump_billion_done   .or. &
+	             (reos_dump_billion == reos_dump_billion_done  .and. &
+		      reos_dump_counter <  reos_dump_counter_done) ) cycle
+	       end if
+               !
+               ! Dump transition information if required on stream 32
+               if (reos_enable_restart   .and.   &
+                   mod(reos_dump_counter,reos_dump_period) == 0) then
+                  rewind (32)
+                  call reos_readwrite_transitions(32,.false.)
+                  rewind (32)
+                  print *, "dump transitions after ",reos_dump_billion,     &
+                     " billion and ",reos_dump_counter," pairs on stream 32."
+               end if
+               !
+               !
+               ! Consider the size of 'symmetry blocks' to find out which
+               ! pairs of determinants cannot contribute
                detsym_i(:) = reos_detsym_f(kf,:) - reos_detsym_i(ki,:)
-               diff_symmetry = sum(abs(detsym_i))
-               if (diff_symmetry > 2) cycle
-
-               ! Define overlap determinant
-               call unpack_occupation_from_integer(asf_final%det_set%determinant(kf), &
-                                                   occupation_f, nocc_f)
-               call unpack_occupation_from_integer(asf_initial%det_set%determinant(ki), &
-                                                   occupation_i, nocc_i)
-               norb_i = 0; norb_f = 0
-               do ia = 1, asf_final%det_set%norbital
+               diff_symmetry = sum( abs(detsym_i) )
+               if (diff_symmetry > 2) then
+                  cycle
+               end if
+               !
+               ! Define the 'overlap determinant' in terms of two orbital lists
+               call unpack_occupation_from_integer(                         &
+                                       asf_final%det_set%determinant(kf),   &
+                                       occupation_f,nocc_f)
+               call unpack_occupation_from_integer(                         &
+                                       asf_initial%det_set%determinant(ki), &
+                                       occupation_i,nocc_i)
+               norb_i = 0;   norb_f = 0
+               do  ia = 1,asf_final%det_set%norbital
                   if (occupation_f(ia) == 1) then
                      norb_f = norb_f + 1
                      orbital_f(norb_f) = asf_final%det_set%orbital(ia)
                   end if
                end do
-               do ia = 1, asf_initial%det_set%norbital
+               do  ia = 1,asf_initial%det_set%norbital
                   if (occupation_i(ia) == 1) then
                      norb_i = norb_i + 1
                      orbital_i(norb_i) = asf_initial%det_set%orbital(ia)
                   end if
                end do
-               if (rabs_use_stop .and. &
-                   (norb_i /= norb_f .or. norb_i /= asf_initial%det_set%number_of_electrons)) then
+               if (rabs_use_stop                             .and.  &
+                  (norb_i /= norb_f                          .or.   &
+                   norb_i /= asf_initial%det_set%number_of_electrons)) then
                   stop "reos_amplitude_different_MM(): program stop C."
                end if
-
-               ! Calculate matrix elements
+               !
+               ! Now distinguish between an 'orthogonal' and 'non-orthogonal'
+               ! treatment
                if (reos_assume_orthogonality) then
-                  call reos_calculate_me_orth(kf, ki, orbital_f, orbital_i, norb_i, &
-                                              MM_photon, i)
+                  call reos_calculate_me_orth(kf,ki,orbital_f,orbital_i,  &
+                                              norb_i,MM_photon,i)
                else
                   detsym_f(:) = reos_detsym_f(kf,:)
                   detsym_i(:) = reos_detsym_i(ki,:)
-                  call reos_calculate_me(kf, ki, orbital_f, orbital_i, norb_i, &
-                                         detsym_f, detsym_i, MM_photon, i)
+                  call reos_calculate_me(kf,ki,orbital_f,orbital_i,norb_i,&
+                                         detsym_f,detsym_i,MM_photon,i)
                end if
             end do
          end do
-      end do
-      !$OMP END DO
-
-      ! Reduce local counters to global counters
-      !$OMP CRITICAL(reduce_counters)
-      reos_calc_billion    = reos_calc_billion + local_reos_calc_billion
-      reos_calc_counter    = reos_calc_counter + local_reos_calc_counter
-      reos_neglect_billion = reos_neglect_billion + local_reos_neglect_billion
-      reos_neglect_counter = reos_neglect_counter + local_reos_neglect_counter
-      !$OMP END CRITICAL
-
-      ! Calculate reduced parts of amplitudes for this thread's transitions
-      do i = 1, number_of_transitions
-         MM_f = -999
-         do kf = 1, asf_final%det_set%nod
-            if (asf_final%asf(transition(i)%asff)%eigenvector(kf) /= zero) then
-               MM_f = asf_final%det_set%determinant(kf)%totalM
-               exit
-            end if
-         end do
-         MM_i = -999
-         do ki = 1, asf_initial%det_set%nod
-            if (asf_initial%asf(transition(i)%asfi)%eigenvector(ki) /= zero) then
-               MM_i = asf_initial%det_set%determinant(ki)%totalM
-               exit
-            end if
-         end do
-         MM_photon = MM_f - MM_i
-
-         do j = 1, transition(i)%number_of_mlines
+         !
+         ! Calculate the 'reduced parts' of the amplitudes
+         do  j = 1,transition(i)%number_of_mlines
             select case(transition(i)%mline(j)%multipole)
             case("E1", "M1");   rank = 1
             case("E2", "M2");   rank = 2
@@ -572,24 +514,20 @@ contains
             case("E5", "M5");   rank = 5
             case default; stop "reos_amplitude_different_MM(): program stop D."
             end select
-            geom_factor = Wigner_Eckardt_geometry(transition(i)%totalJ_f, MM_f, &
-                                                  rank+rank, MM_photon, transition(i)%totalJ_i, MM_i)
+            geom_factor = Wigner_Eckardt_geometry(transition(i)%totalJ_f,MM_f,&
+                              rank+rank,MM_photon,transition(i)%totalJ_i,MM_i)
             if (abs(geom_factor) < eps10) then
-               !$OMP CRITICAL(error_print)
-               print *, "i, Jf, MMf, rank, MMp, Ji, MMi = ", &
-                        i, transition(i)%totalJ_f, MM_f, &
-                        rank, MM_photon, transition(i)%totalJ_i, MM_i
-               print *, "geom_factor = ", geom_factor
+               print *, "i, Jf, MMf, rank, MMp, Ji, MMi = ",     &
+                        i, transition(i)%totalJ_f,MM_f,          &
+                        rank,MM_photon,transition(i)%totalJ_i,MM_i
+               print *, "geom_factor = ",geom_factor
                stop "reos_amplitude_different_MM(): program stop E."
-               !$OMP END CRITICAL
             end if
-            !$OMP CRITICAL(update_amplitude)
             transition(i)%mline(j)%amplitude = &
             transition(i)%mline(j)%amplitude / geom_factor
-            !$OMP END CRITICAL
          end do
       end do
-      !$OMP END PARALLEL
+      !
    end subroutine reos_amplitude_different_MM
    !
    !
@@ -598,9 +536,10 @@ contains
    ! Calculates the multipole amplitudes for all transitions for the
    ! case that all Slater determinants have the same M projections
    ! in the initial and final states.
-   !
+   ! 
    ! Calls: spherical_Bessel_jL().
    !--------------------------------------------------------------------
+      !
       integer :: diff_symmetry, i, j, ki, kf, nocc_i, nocc_f,                  &
                  MM_i, MM_f, MM_photon, norb_i, norb_f, rank,                  &
                  reos_pair_billion, reos_pair_counter, reos_calc_billion,      &
@@ -609,12 +548,8 @@ contains
                                               occupation_i, occupation_f
       real(kind=dp) :: geom_factor, wa, weight, total
       type(nkappam), dimension(:), allocatable :: orbital_i, orbital_f
-
-      ! Thread-private variables for parallel region
-      integer :: local_reos_calc_billion, local_reos_calc_counter, &
-                 local_reos_neglect_billion, local_reos_neglect_counter
-
-      ! Allocate storage for working arrays outside parallel region
+      !
+      ! Allocate storage for some working arrays
       nocc_f = asf_final%det_set%noint * &
                bit_size(asf_final%det_set%determinant(1)%occupation(1))
       nocc_i = asf_initial%det_set%noint * &
@@ -624,168 +559,132 @@ contains
                 detsym_i(number_of_symmetry_blocks),                    &
                 orbital_i(1:asf_initial%det_set%number_of_electrons),   &
                 orbital_f(1:asf_final%det_set%number_of_electrons) )
-
+      !
       ! Set M quantum numbers for the transition amplitudes
       MM_i      = asf_initial%det_set%determinant(1)%totalM
       MM_f      = asf_final%det_set%determinant(1)%totalM
       MM_photon = MM_f - MM_i
-
-      ! Initialize global counters
+      !
+      ! Now cycle over all pairs of final- and initial-state determinants 
+      ! Use separate routine if initial- and final-state orbitals are
+      ! assumed to be orthogonal
       reos_dump_billion    = 0;   reos_dump_counter    = 0
       reos_pair_billion    = 0;   reos_pair_counter    = 1
       reos_calc_billion    = 0;   reos_calc_counter    = 0
       reos_neglect_billion = 0;   reos_neglect_counter = 0
-
+      !
       total = (asf_final%det_set%nod+zero) * asf_initial%det_set%nod
       print *, "About ",total," pairs of final- and initial-state "// &
                "need to be calculated."
-
-      ! Parallelize the outer loop over final-state determinants
-      !$OMP PARALLEL PRIVATE(kf, ki, i, j, weight, wa, diff_symmetry, &
-      !$OMP                  norb_i, norb_f, detsym_i, detsym_f, &
-      !$OMP                  occupation_i, occupation_f, orbital_i, orbital_f, &
-      !$OMP                  local_reos_calc_billion, local_reos_calc_counter, &
-      !$OMP                  local_reos_neglect_billion, local_reos_neglect_counter) &
-      !$OMP          SHARED(reos_dump_billion, reos_dump_counter, &
-      !$OMP                  reos_pair_billion, reos_pair_counter, &
-      !$OMP                  reos_calc_billion, reos_calc_counter, &
-      !$OMP                  reos_neglect_billion, reos_neglect_counter, &
-      !$OMP                  asf_final, asf_initial, transition, MM_photon)
-      ! Initialize thread-local counters
-      local_reos_calc_billion    = 0
-      local_reos_calc_counter    = 0
-      local_reos_neglect_billion = 0
-      local_reos_neglect_counter = 0
-
-      !$OMP DO SCHEDULE(DYNAMIC)
+      !
       do kf = 1,asf_final%det_set%nod
-         do ki = 1,asf_initial%det_set%nod
-            ! Update pair counter (atomic to avoid race condition)
-            !$OMP ATOMIC
-            reos_pair_counter = reos_pair_counter + 1
-            if (reos_pair_counter >= 1000000000) then
-               !$OMP CRITICAL
-               reos_pair_billion = reos_pair_billion + 1
-               reos_pair_counter = 0
-               !$OMP END CRITICAL
-            end if
-
-            !$OMP ATOMIC
-            reos_dump_counter = reos_dump_counter + 1
-            if (reos_dump_counter >= 1000000000) then
-               !$OMP CRITICAL
-               reos_dump_billion = reos_dump_billion + 1
-               reos_dump_counter = 0
-               !$OMP END CRITICAL
-            end if
-
-            ! Periodic status output and dump (only one thread at a time)
-            if (mod(reos_pair_counter, reos_determinant_counter) == 0) then
-               !$OMP CRITICAL(print_status)
+         do  ki = 1,asf_initial%det_set%nod
+            if (mod(reos_pair_counter,reos_determinant_counter) == 0) then
                print *, "  ",reos_calc_billion,"billion",reos_calc_counter, &
                         "pairs calculated;",reos_neglect_billion,"billion", &
-                        reos_neglect_counter,"neglected;",                 &
-                        reos_pair_billion,"billion",reos_pair_counter,     &
-                        "in total;"
-               !$OMP END CRITICAL
+                         reos_neglect_counter,"neglected;",                 &
+                         reos_pair_billion,"billion",reos_pair_counter,     &
+                        "in total;"       
             end if
-
-            ! Dump transition information if required
-            if (reos_enable_restart .and. &
-                mod(reos_dump_counter, reos_dump_period) == 0) then
-               !$OMP CRITICAL(dump_transitions)
+            reos_pair_counter = reos_pair_counter + 1
+            if (reos_pair_counter == 1000000000) then
+               reos_pair_billion  = reos_pair_billion + 1
+               reos_pair_counter  = 0
+            end if
+            reos_dump_counter = reos_dump_counter + 1
+            if (reos_dump_counter == 1000000000) then
+               reos_dump_billion  = reos_dump_billion + 1
+               reos_dump_counter  = 0
+            end if
+	    !
+	    if (reos_apply_restart) then
+	       if (reos_dump_billion <  reos_dump_billion_done   .or. &
+	          (reos_dump_billion == reos_dump_billion_done  .and. &
+		   reos_dump_counter <  reos_dump_counter_done) ) cycle
+	    end if
+            !
+            ! Dump transition information if required on stream 32
+            if (reos_enable_restart   .and.   &
+                mod(reos_dump_counter,reos_dump_period) == 0) then
                rewind (32)
-               call reos_readwrite_transitions(32, .false.)
+               call reos_readwrite_transitions(32,.false.)
                rewind (32)
                print *, "dump transitions after ",reos_dump_billion, &
                         " billion and ",reos_dump_counter," pairs on stream 32."
-               !$OMP END CRITICAL
             end if
-
-            ! Skip if restarting and this pair was already processed
-            if (reos_apply_restart) then
-               if (reos_dump_billion < reos_dump_billion_done .or. &
-                   (reos_dump_billion == reos_dump_billion_done .and. &
-                    reos_dump_counter < reos_dump_counter_done)) cycle
-            end if
-
-            ! Calculate maximum weight across transitions
+            !
             weight = zero
-            do i = 1, number_of_transitions
-               wa = asf_final%asf(transition(i)%asff)%eigenvector(kf) * &
-                    asf_initial%asf(transition(i)%asfi)%eigenvector(ki)
+            do  i  = 1,number_of_transitions
+               wa  = asf_final%asf(transition(i)%asff)%eigenvector(kf) * &
+                     asf_initial%asf(transition(i)%asfi)%eigenvector(ki)
                weight = max(weight, abs(wa))
             end do
-
-            if (weight < reos_determinant_cutoff) then
-               local_reos_neglect_counter = local_reos_neglect_counter + 1
-               if (local_reos_neglect_counter >= 1000000000) then
-                  local_reos_neglect_billion = local_reos_neglect_billion + 1
-                  local_reos_neglect_counter = 0
+            if (weight < reos_determinant_cutoff) then 
+               reos_neglect_counter = reos_neglect_counter + 1
+               if (reos_neglect_counter == 1000000000) then
+                  reos_neglect_billion  = reos_neglect_billion + 1
+                  reos_neglect_counter  = 0
                end if
                cycle
             else
-               local_reos_calc_counter = local_reos_calc_counter + 1
-               if (local_reos_calc_counter >= 1000000000) then
-                  local_reos_calc_billion = local_reos_calc_billion + 1
-                  local_reos_calc_counter = 0
+               reos_calc_counter = reos_calc_counter + 1
+               if (reos_calc_counter == 1000000000) then
+                  reos_calc_billion  = reos_calc_billion + 1
+                  reos_calc_counter  = 0
                end if
             end if
-
-            ! Check symmetry blocks
+            !
+            ! Consider the size of 'symmetry blocks' to find out which
+            ! pairs of determinants cannot contribute
             detsym_i(:) = reos_detsym_f(kf,:) - reos_detsym_i(ki,:)
-            diff_symmetry = sum(abs(detsym_i))
-            if (diff_symmetry > 2) cycle
-
-            ! Define the 'overlap determinant'
-            call unpack_occupation_from_integer(asf_final%det_set%determinant(kf), &
-                                                occupation_f, nocc_f)
-            call unpack_occupation_from_integer(asf_initial%det_set%determinant(ki), &
-                                                occupation_i, nocc_i)
-            norb_i = 0; norb_f = 0
-            do i = 1, asf_final%det_set%norbital
+            diff_symmetry = sum( abs(detsym_i) )
+            if (diff_symmetry > 2) then
+               cycle
+            end if
+            !
+            ! Define the 'overlap determinant' in terms of two orbital lists
+            call unpack_occupation_from_integer(                         &
+                                    asf_final%det_set%determinant(kf),   &
+                                    occupation_f,nocc_f)
+            call unpack_occupation_from_integer(                         &
+                                    asf_initial%det_set%determinant(ki), &
+                                    occupation_i,nocc_i)
+            norb_i = 0;   norb_f = 0
+            do  i = 1,asf_final%det_set%norbital
                if (occupation_f(i) == 1) then
                   norb_f = norb_f + 1
                   orbital_f(norb_f) = asf_final%det_set%orbital(i)
                end if
             end do
-            do i = 1, asf_initial%det_set%norbital
+            do  i = 1,asf_initial%det_set%norbital
                if (occupation_i(i) == 1) then
                   norb_i = norb_i + 1
                   orbital_i(norb_i) = asf_initial%det_set%orbital(i)
                end if
             end do
-            if (rabs_use_stop .and. &
-                (norb_i /= norb_f .or. norb_i /= asf_initial%det_set%number_of_electrons)) then
+            if (rabs_use_stop                             .and.  &
+               (norb_i /= norb_f                          .or.   &
+                norb_i /= asf_initial%det_set%number_of_electrons)) then
                stop "reos_calculate_amplitudes(): program stop A."
             end if
-
-            ! Calculate matrix elements
+            !
+            ! Now distinguish between an 'orthogonal' and 'non-orthogonal'
+            ! treatment
             if (reos_assume_orthogonality) then
-               call reos_calculate_me_orth(kf, ki, orbital_f, orbital_i, norb_i, &
-                                           MM_photon, 0)
+               call reos_calculate_me_orth(kf,ki,orbital_f,orbital_i,norb_i, &
+                                           MM_photon,0)
             else
                detsym_f(:) = reos_detsym_f(kf,:)
                detsym_i(:) = reos_detsym_i(ki,:)
-               call reos_calculate_me(kf, ki, orbital_f, orbital_i, norb_i, &
-                                      detsym_f, detsym_i, MM_photon, 0)
+               call reos_calculate_me(kf,ki,orbital_f,orbital_i,norb_i,  &
+                                      detsym_f,detsym_i,MM_photon,0)
             end if
          end do
       end do
-      !$OMP END DO
-
-      ! Reduce local counters to global counters
-      !$OMP CRITICAL(reduce_counters)
-      reos_calc_billion    = reos_calc_billion + local_reos_calc_billion
-      reos_calc_counter    = reos_calc_counter + local_reos_calc_counter
-      reos_neglect_billion = reos_neglect_billion + local_reos_neglect_billion
-      reos_neglect_counter = reos_neglect_counter + local_reos_neglect_counter
-      !$OMP END CRITICAL
-      !$OMP END PARALLEL
-
-      ! Calculate the 'reduced parts' of the amplitudes (serial section)
-      do i = 1, number_of_transitions
-         do j = 1, transition(i)%number_of_mlines
+      !
+      ! Calculate the 'reduced parts' of the amplitudes
+      do  i = 1,number_of_transitions
+         do  j = 1,transition(i)%number_of_mlines
             select case(transition(i)%mline(j)%multipole)
             case("E1", "M1");   rank = 1
             case("E2", "M2");   rank = 2
@@ -794,21 +693,20 @@ contains
             case("E5", "M5");   rank = 5
             case default; stop "reos_calculate_amplitudes(): program stop B."
             end select
-            geom_factor = Wigner_Eckardt_geometry(transition(i)%totalJ_f, MM_f, &
-                              rank+rank, MM_photon, transition(i)%totalJ_i, MM_i)
+            geom_factor = Wigner_Eckardt_geometry(transition(i)%totalJ_f,MM_f,&
+                              rank+rank,MM_photon,transition(i)%totalJ_i,MM_i)
             if (abs(geom_factor) < eps10) then
-               print *, "i, Jf, MMf, rank, MMp, Ji, MMi = ", &
-                        i, transition(i)%totalJ_f, MM_f, &
-                        rank, MM_photon, transition(i)%totalJ_i, MM_i
-               print *, "geom_factor = ", geom_factor
+               print *, "i, Jf, MMf, rank, MMp, Ji, MMi = ",     &
+                        i, transition(i)%totalJ_f,MM_f,          &
+                        rank,MM_photon,transition(i)%totalJ_i,MM_i
+               print *, "geom_factor = ",geom_factor
                stop "reos_calculate_amplitudes(): program stop C."
             end if
-            !$OMP CRITICAL(update_amplitude)
             transition(i)%mline(j)%amplitude = &
             transition(i)%mline(j)%amplitude / geom_factor
-            !$OMP END CRITICAL
          end do
       end do
+      !
    end subroutine reos_amplitude_same_MM
    !
    !
@@ -816,7 +714,7 @@ contains
    !--------------------------------------------------------------------
    ! Calculates the Bessel function j_L (w/c*r) over the radial grid
    ! r_grasp2k.
-   !
+   ! 
    ! Calls: spherical_Bessel_jL().
    !--------------------------------------------------------------------
       !
@@ -826,7 +724,7 @@ contains
       !
       integer :: i
       !
-      ! Calculate the Bessel function
+      ! Calculate the Bessel function 
       bessel(1) = zero
       do  i = 2,n_grasp2k
          bessel(i) = spherical_Bessel_jL(L, abs(omega_over_c*r_grasp2k(i)))
@@ -837,18 +735,18 @@ contains
    !
    subroutine reos_calculate_amplitudes()
    !--------------------------------------------------------------------
-   ! Initializes the computation of relaxed-orbital transition probabilities
-   ! and lifetimes and calculates the transition amplitudes for all
+   ! Initializes the computation of relaxed-orbital transition probabilities 
+   ! and lifetimes and calculates the transition amplitudes for all 
    ! transitions; several computational modes are supported due to to set
-   ! up of various logical flags. The main modes are
+   ! up of various logical flags. The main modes are 
    !    (i)   full relaxed-orbital transition probabilities,
    !    (ii)  transition probabilities assuming orthogonal orbitals,
-   !    (iii) transition probabilities with the 'same' set of radial
+   !    (iii) transition probabilities with the 'same' set of radial 
    !          integrals for all transitions, for both modes: relaxed-
    !          orbitals or assumed orthogonal orbitals.
    !
    ! Calls: call reos_calculate_me_orth(), call reos_calculate_me(),
-   !        reos_print_transitions(), reos_set_determinant_sym(),
+   !        reos_print_transitions(), reos_set_determinant_sym(), 
    !        reos_set_overlaps(), reos_set_radial_integrals(),
    !        reos_set_transitions(),unpack_occupation_from_integer(),
    !        Wigner_Eckardt_geometry().
@@ -894,7 +792,7 @@ contains
       ! If all determinents of the initial respectively the final states
       ! have the same M-projection, all selected transitions can be calculated
       ! within a single run through all pairs of determinant.
-      same_MM = .true.;
+      same_MM = .true.;   
       MM_i    = asf_initial%det_set%determinant(1)%totalM
       MM_f    = asf_final%det_set%determinant(1)%totalM
       do  i = 1,asf_initial%det_set%nod
@@ -914,24 +812,24 @@ contains
          call reos_amplitude_same_MM()
       else
          call reos_amplitude_different_MM()
-      end if
+      end if 
       !
    end subroutine reos_calculate_amplitudes
-   !
+   !  
    !
    subroutine reos_calculate_me(detf,deti,orbital_f,orbital_i,norb, &
                                 detsym_f,detsym_i,MM_photon,trans)
    !--------------------------------------------------------------------
-   ! Calculates the contributions of the one-particle multipole operators
+   ! Calculates the contributions of the one-particle multipole operators 
    ! for all defined transitions for a given pair of Slater determinants.
    ! It first calculates the matrix of co-factors D(K/L); then the
-   ! individual matrix elements are obtained from
+   ! individual matrix elements are obtained from  
    !
    !         Sum_{k,l}  <k|op|l> * d(k;l) * (-1)**(k+l)
    !
-   ! where <k|op|l> is the corresponding one-particle matrix element.
-   ! Here, k denotes a final and l an initial state orbital, i.e. in
-   ! general <k|op|l>  =/=  <l|op|k>. the d(k/l) are the co-determinants
+   ! where <k|op|l> is the corresponding one-particle matrix element. 
+   ! Here, k denotes a final and l an initial state orbital, i.e. in 
+   ! general <k|op|l>  =/=  <l|op|k>. the d(k/l) are the co-determinants 
    ! to the overlap-matrix of the Slater determinants.
    !
    ! Calls: angular_momentum_j(), cofactor_1_of_overlap_matrix(),
@@ -946,8 +844,8 @@ contains
       integer       :: diff_symmetry, i, j, ki, kf, L, m, rf, ri,   &
                        j_f, kappa_f, mm_f, pqn_f, j_i, kappa_i, mm_i, pqn_i, &
                        i_lower, i_upper
-      real(kind=dp) :: gf, me, minor
-      logical       :: need_calculation
+      real(kind=dp) :: gf, me, minor           
+      logical       :: need_calculation 
       logical, dimension(norb,norb)       :: cofactors_1_mask
       real(kind=dp), dimension(norb,norb) :: overlap, cofactors_1
       integer, dimension(number_of_symmetry_blocks) :: detsym_ir, detsym_fr
@@ -994,7 +892,7 @@ contains
       ! in an inner loop then cycle over the individual co-factors
       if (trans == 0) then
          i_lower = 1;  i_upper = number_of_transitions
-      else
+      else 
          i_lower = trans;  i_upper = trans
       end if
       !
@@ -1027,7 +925,7 @@ contains
                   ! Calculate the 'geometrical factor' to the complete ME
                   gf = Wigner_Eckardt_geometry(j_f,mm_f,L+L,MM_photon,j_i,mm_i)
                   if (abs(gf) > eps10) then
-                     !
+                     ! 
                      ! Select orbital functions
                      rf = -1;   ri = -1
                      do m = 1,wave_final%number_of_rwf
@@ -1076,7 +974,7 @@ contains
    subroutine reos_calculate_me_orth(detf,deti,orbital_f,orbital_i,norb,     &
                                                               MM_photon,trans)
    !--------------------------------------------------------------------
-   ! Calculates the contributions of the one-particle multipole operators
+   ! Calculates the contributions of the one-particle multipole operators 
    ! for all defined transitions for a given pair of Slater determinants.
    ! It assumes that all orbitals are orthogonal to each other.
    ! Therefore, the calculation of cofactors can be avoided; they vanish
@@ -1086,12 +984,12 @@ contains
    !
    !         Sum_{k,l}  <k|op|l> * d(k;l) * (-1)**(k+l)
    !
-   ! where <k|op|l> is the corresponding one-particle matrix element.
-   ! Here, k denotes a final and l an initial state orbital, i.e. in
-   ! general <k|op|l>  =/=  <l|op|k>. the d(k/l) are the co-determinants
+   ! where <k|op|l> is the corresponding one-particle matrix element. 
+   ! Here, k denotes a final and l an initial state orbital, i.e. in 
+   ! general <k|op|l>  =/=  <l|op|k>. the d(k/l) are the co-determinants 
    ! to the overlap-matrix of the Slater determinants.
    !
-   ! Calls: angular_momentum_j(), reos_return_M_integral(),
+   ! Calls: angular_momentum_j(), reos_return_M_integral(), 
    !        Wigner_Eckardt_geometry().
    !--------------------------------------------------------------------
       !
@@ -1102,7 +1000,7 @@ contains
       integer       :: diff_occ, i, j, ki, kf, L, m, phase, p, rf, ri,   &
                        j_f, kappa_f, mm_f, j_i, kappa_i, mm_i,           &
                        i_lower, i_upper
-      real(kind=dp) :: gf, minor, me
+      real(kind=dp) :: gf, minor, me          
       real(kind=dp), dimension(norb,norb) :: cofactors_1
       integer, dimension(norb)            :: occupation_i, occupation_f
       !
@@ -1117,7 +1015,7 @@ contains
                 orbital_f(i)%kappa == orbital_i(j)%kappa   .and.  &
                 orbital_f(i)%mm    == orbital_i(j)%mm  ) then
                occupation_i(i) = 1
-               exit
+               exit 
             end if
          end do
       end do
@@ -1137,11 +1035,11 @@ contains
                    orbital_f(i)%kappa == orbital_i(j)%kappa   .and.  &
                    orbital_f(i)%mm    == orbital_i(j)%mm  ) then
                   occupation_i(j) = 0
-                  cycle iloop
+                  cycle iloop 
                end if
             end do
-            occupation_f(i) = 1
-         end do iloop
+            occupation_f(i) = 1 
+         end do iloop 
          if (rabs_use_stop            .and.                         &
             (sum(occupation_f) /= 1   .or.   sum(occupation_i) /= 1)) then
             stop "reos_calculate_me_orth(): program stop B."
@@ -1171,7 +1069,7 @@ contains
                print *, "(p,orbital_i(p)%n,orbital_i(p)%kappa,"//         &
                                           "orbital_i(p)%mm,p=1,norb) = ", &
                          (p,orbital_i(p)%n,orbital_i(p)%kappa,            &
-                                           orbital_i(p)%mm,p=1,norb)
+                                           orbital_i(p)%mm,p=1,norb) 
                stop "reos_calculate_me_orth(): program stop C."
             end if
          end do
@@ -1187,7 +1085,7 @@ contains
             end if
          end do
          end if
-         !
+         ! 
          do  i = 1,norb
             cofactors_1(i,i) = one
          end do
@@ -1199,7 +1097,7 @@ contains
       ! in an inner loop then cycle over the individual co-factors
       if (trans == 0) then
          i_lower = 1;  i_upper = number_of_transitions
-      else
+      else 
          i_lower = trans;  i_upper = trans
       end if
       !
@@ -1231,7 +1129,7 @@ contains
                   ! Calculate the 'geometrical factor' to the complete ME
                   gf = Wigner_Eckardt_geometry(j_f,mm_f,L+L,MM_photon,j_i,mm_i)
                   if (abs(gf) > eps10) then
-                     !
+                     ! 
                      ! Select orbital functions
                      rf = -1;   ri = -1
                      do m = 1,wave_final%number_of_rwf
@@ -1327,7 +1225,7 @@ contains
       ! Adopt previously calculated probabilities and lifetimes to
       ! experimental transition energies
       !
-      ! Select individual pairs of transitions
+      ! Select individual pairs of transitions 
       call input_transition_pairs(number_of_transitions)
       !
       print *, "Assume orthogonality between the orbital sets of the"// &
@@ -1443,7 +1341,7 @@ contains
    subroutine reos_convert_probability(totalJ_i,totalJ_f,L,energy_au, &
 		   amplitude,einstein_A,einstein_B,oscillator,decay_width)
    !--------------------------------------------------------------------
-   ! Returns the basic oscillator strength, Einstein A and B coefficients,
+   ! Returns the basic oscillator strength, Einstein A and B coefficients, 
    ! and the decay width for a given transition amplitude.
    !--------------------------------------------------------------------
       !
@@ -1477,7 +1375,7 @@ contains
    !
    subroutine reos_initialize_rwf_storage()
    !--------------------------------------------------------------------
-   ! Initializes the arrays of type(grasp2k_orbital) for the storage of
+   ! Initializes the arrays of type(grasp2k_orbital) for the storage of 
    ! the radial wave functions.
    !--------------------------------------------------------------------
       !
@@ -1500,7 +1398,7 @@ contains
       do  iorb = 1,asf_initial%det_set%norbital
          if (asf_initial%det_set%orbital(iorb)%n     /= n     .or.   &
              asf_initial%det_set%orbital(iorb)%kappa /= kappa) then
-            i     = i + 1
+            i     = i + 1 
             n     = asf_initial%det_set%orbital(iorb)%n
             kappa = asf_initial%det_set%orbital(iorb)%kappa
             wave_initial%rwf(i)%orbital%n     =  &
@@ -1552,7 +1450,7 @@ contains
       if (rabs_use_stop   .and.   i /= wave_final%number_of_rwf) then
          stop "reos_initialize_rwf_storage(): program stop B."
       end if
-      !
+      ! 
    end subroutine reos_initialize_rwf_storage
    !
    !
@@ -1606,10 +1504,10 @@ contains
    !
    subroutine reos_open_restart(first_time)
    !--------------------------------------------------------------------
-   ! Opens two restart file for the REOS program and writes out a
+   ! Opens two restart file for the REOS program and writes out a 
    ! header to these files;  .res-dump  contains a compact representation
    ! of the determinant basis, mixing coefficients, and radial integrals,
-   ! and .res-tran contains a list of all transitions and transition
+   ! and .res-tran contains a list of all transitions and transition 
    ! amplitudes from which the calculation starts again.
    !
    ! Calls: file_open().
@@ -1660,7 +1558,7 @@ contains
                        tc, tc_au, tc_cm, tc_ev, tc_sec, tb_inv, tc_inv
       real(kind=dp), dimension(:), allocatable :: total_babushkin, &
                                                   total_coulomb
-      logical, dimension(:), allocatable       :: pure_magnetic
+      logical, dimension(:), allocatable       :: pure_magnetic  
       !
       istate_low = 10000;   istate_up = -10000
       do  i = 1,number_of_transitions
@@ -1693,14 +1591,14 @@ contains
       !
       if (energy_unit == "A      "  .and.  reos_print_AB_in_hartree) then
          write(stream,2)
-         write(stream,4)
+         write(stream,4) 
       else if (energy_unit == "A      ") then
          write(stream,3)
-         write(stream,5)
+         write(stream,5) 
       else if (reos_print_AB_in_hartree) then
          write(stream,2)
          write(stream,6) trim(energy_unit)
-      else
+      else 
          write(stream,3)
          write(stream,7) trim(energy_unit)
       endif
@@ -1713,7 +1611,7 @@ contains
               / 2x,"LevI-LevF  I- J / Parity -F      Energy   ",             &
                    "Multipol   Gauge         Einstein coefficients",         &
                    "       Oscillator    Decay width  ",                     &
-              /71x,"-1           3 -2 -1 " )
+              /71x,"-1           3 -2 -1 " )   
     4 format(  30x,"   (Angstroms)",                                         &
                23x,"A (a.u.)    gB (a.u.)        strength GF       (eV) ")
     5 format(  30x,"   (Angstroms)",                                         &
@@ -1794,12 +1692,12 @@ contains
       do  i = istate_low,istate_up
          if( total_babushkin(i) == zero  .and.  total_coulomb(i) == zero) then
             cycle
-         end if
+         end if 
          tb = total_Babushkin(i)
          tc = total_Coulomb(i)
          if (.not.reos_print_AB_in_hartree) then
-            tb_cm  = tb / c_vacuum_in_cm_per_s
-            tc_cm  = tc / c_vacuum_in_cm_per_s
+            tb_cm  = tb / c_vacuum_in_cm_per_s 
+            tc_cm  = tc / c_vacuum_in_cm_per_s 
             tc_au  = tc_cm / convert_au_to_kaysers
             tb_au  = tb_cm / convert_au_to_kaysers
             tc_sec = one / tc
@@ -1827,7 +1725,7 @@ contains
             write(stream,12) i,tb_sec,tb_inv,tb_au,tb_cm,tb_ev
             write(stream,13)   tc_sec,tc_inv,tc_au,tc_cm,tc_ev
          end if
-      11 format(1x,i4,6x,"Magnetic:  ",5(1pd20.7)/)
+      11 format(1x,i4,6x,"Magnetic:  ",5(1pd20.7)/) 
       12 format(1x,i4,6x,"Babushkin: ",5(1pd20.7))
       13 format(     11x,"Coulomb:   ",5(1pd20.7)/)
          !
@@ -1850,7 +1748,7 @@ contains
       character(len=8)  :: cdate
       character(len=10) :: ctime
       !
-      ! Get the date and time of day; make this information the header of
+      ! Get the date and time of day; make this information the header of 
       ! the  reos.sum  summary file
       call date_and_time(date=cdate,time=ctime)
       month = get_month(cdate(5:6))
@@ -1974,8 +1872,8 @@ contains
    !
    subroutine reos_print_transitions(stream)
    !--------------------------------------------------------------------
-   ! Prints a neat table of all selected transitions on stream before
-   ! the actual computation starts; only the quantum numbers of the atomic
+   ! Prints a neat table of all selected transitions on stream before 
+   ! the actual computation starts; only the quantum numbers of the atomic 
    ! states and the transition energies are displayed.
    !
    ! Calls: angular_momentum_string().
@@ -2006,11 +1904,11 @@ contains
                    trim(angular_momentum_string(transition(i)%totalJ_f,4)), &
                          transition(i)%parity_f,energy,(mult(j),j=1,nmult)
       end do
-      write(stream,3)
+      write(stream,3) 
     1 format( "The following ",i5," transitions are selected:",              &
         //,"     I-level-F     I--J^P--F      Transition Energy       ",     &
            "Multipoles ",                                                    &
-         /,"                                     (in ",a4,")  ",             &
+         /,"                                     (in ",a4,")  ",             &  
          /,4x,66("-") )
     2 format(4x,i4," -",i4,3x,a4,a1,3x,a4,a1,5x,1pe14.7,9x,10(a2,1x))
     3 format(4x,66("-") )
@@ -2018,7 +1916,7 @@ contains
    end subroutine reos_print_transitions
    !
    !
-   subroutine reos_readwrite_dump(stream,read_from)
+   subroutine reos_readwrite_dump(stream,read_from)             
    !--------------------------------------------------------------------
    ! Reads or writes all necessary information (apart from the transition()
    ! array) for restarting REOS from or to a file on stream.
@@ -2058,7 +1956,7 @@ contains
                          reos_dump_period            ,  &
                          reos_dump_billion           ,  &
                          reos_dump_counter           ,  &
-                         reos_determinant_cutoff
+                         reos_determinant_cutoff   
          read(stream,*)  energy_factor               ,  &
                          energy_unit
 	 read(stream,*)  need_overlap, bl1, bu1, bl2, bu2, bl3, bu3
@@ -2079,12 +1977,12 @@ contains
             end do
 	 end if
 	 !
-         read(stream,*)  sym_block
+         read(stream,*)  sym_block 
 	 read(stream,*)  need_detsym
 	 if (need_detsym) then
-            call reos_set_determinant_sym()
+            call reos_set_determinant_sym() 
          end if
-         read(stream,*)  debug_reduced_M_integral
+         read(stream,*)  debug_reduced_M_integral 
       else
          write(stream,*) c
          write(stream,*) reos_use_compact_xpn_file   ,  &
@@ -2106,7 +2004,7 @@ contains
                          reos_dump_period            ,  &
                          reos_dump_billion           ,  &
                          reos_dump_counter           ,  &
-                         reos_determinant_cutoff
+                         reos_determinant_cutoff   
          write(stream,*) energy_factor               ,  &
                          energy_unit
          if (allocated(reos_overlap)) then
@@ -2121,7 +2019,7 @@ contains
 	 end if
 	 write(stream,*) need_overlap, bl1, bu1, bl2, bu2, bl3, bu3
 	 !
-         write(stream,*) sym_block
+         write(stream,*) sym_block 
          !
          if (allocated(reos_detsym_i)  .or.  allocated(reos_detsym_f)) then
             need_detsym = .true.
@@ -2129,15 +2027,15 @@ contains
             need_detsym = .false.
          end if
 	 write(stream,*) need_detsym
-         write(stream,*) debug_reduced_M_integral
+         write(stream,*) debug_reduced_M_integral 
       end if
       !
    end subroutine reos_readwrite_dump
    !
    !
-   subroutine reos_readwrite_transitions(stream,read_from)
+   subroutine reos_readwrite_transitions(stream,read_from)             
    !--------------------------------------------------------------------
-   ! Reads or writes the array transitions()) of type(reos_transition)
+   ! Reads or writes the array transitions()) of type(reos_transition) 
    ! from or to a file on stream.
    !--------------------------------------------------------------------
       !
@@ -2148,7 +2046,7 @@ contains
                  bl1, bu1, bl2, bu2, bl3, bu3, bl4, bu4
       logical :: needb0, needb1, needb2, needb3, needb4, needb5, &
                  need_radial_int
-      real(kind=dp)                         :: arg
+      real(kind=dp)                         :: arg	 
       real(kind=dp), dimension(1:n_grasp2k) :: bessel
       !
       if (read_from) then
@@ -2171,7 +2069,7 @@ contains
             read(stream,*)  transition(i)%parity_i
 	    read(stream,*)  transition(i)%parity_f
  	    allocate( transition(i)%mline(1:transition(i)%number_of_mlines) )
-	    read(stream,*)  needb0, needb1, needb2, needb3, needb4, needb5
+	    read(stream,*)  needb0, needb1, needb2, needb3, needb4, needb5  
             arg = transition(i)%energy / c
             if (needb0) then
 	       allocate( transition(i)%bessel0(1:n_grasp2k) )
@@ -2213,8 +2111,8 @@ contains
 	       if (need_radial_int) then
 	          allocate( transition(i)%mline(j)%radial_int(bl1:bu1, &
 		                              bl2:bu2,bl3:bu3,bl4:bu4) )
-                  transition(i)%mline(j)%radial_int = zero
-                  !
+                  transition(i)%mline(j)%radial_int = zero 
+                  !                
                   do  i1 = 1,wave_final%number_of_rwf
                      do  i2 = 1,wave_initial%number_of_rwf
                         pqn_f   = wave_final%rwf(i1)%orbital%n
@@ -2242,8 +2140,8 @@ contains
 			    transition(i)%energy
             write(stream,*) transition(i)%parity_i
 	    write(stream,*) transition(i)%parity_f
-	    needb0 = .false.; needb1 = .false.; needb2 = .false.
-	    needb3 = .false.; needb4 = .false.; needb5 = .false.
+	    needb0 = .false.; needb1 = .false.; needb2 = .false. 
+	    needb3 = .false.; needb4 = .false.; needb5 = .false. 
             do  m = 1,transition(i)%number_of_mlines
             select case(transition(i)%mline(m)%multipole)
             case("E1", "M1"); needb0 = .true.; needb1 = .true.; needb2 = .true.
@@ -2254,7 +2152,7 @@ contains
                stop "reos_readwrite_transitions(): program stop A."
             end select
             end do
-	    write(stream,*) needb0, needb1, needb2, needb3, needb4, needb5
+	    write(stream,*) needb0, needb1, needb2, needb3, needb4, needb5  
 	    !
 	    do  j = 1,transition(i)%number_of_mlines
 	       write(stream,*) transition(i)%mline(j)%multipole
@@ -2288,7 +2186,7 @@ contains
       !
    end subroutine reos_readwrite_transitions
    !
-   !
+   ! 
    function reos_reduced_M_integral(tr,multipole,gauge,rwf_f,rwf_i) &
                                                           result(red_me)
    !--------------------------------------------------------------------
@@ -2363,7 +2261,7 @@ contains
       select case(multipole)
       case("M1", "M2", "M3", "M4")
          ta(1) = zero
-         ta(2:mtp) = ( rwf_f%P(2:mtp)*rwf_i%Q(2:mtp) +                   &
+         ta(2:mtp) = ( rwf_f%P(2:mtp)*rwf_i%Q(2:mtp) +                   & 
                        rwf_f%Q(2:mtp)*rwf_i%P(2:mtp) ) * rp_grasp2k(2:mtp)
          select case(multipole)
          case("M1")
@@ -2379,7 +2277,7 @@ contains
          red_me = factor * red_me
       case("E1", "E2", "E3", "E4")
          ta(1) = zero
-         !
+         ! 
          ! Tabulate coulomb integrand
          !
          wa    = sqrt(L/(L+one))*(kapa-kapb);  wb = sqrt(L/(L+one))*(L+one)
@@ -2423,7 +2321,7 @@ contains
             red_me = red_Coulomb
             if (debug_reduced_M_integral) &
                write(99,*) "factor, red_Coulomb = ",factor, red_me
-            deallocate( ta )
+            deallocate( ta ) 
             return
          else if (gauge == "Babushkin") then
          else if (rabs_use_stop) then
@@ -2488,7 +2386,7 @@ contains
          stop "reos_reduced_M_integral(): program stop C."
       end select
       !
-      deallocate( ta )
+      deallocate( ta ) 
       !
    end function reos_reduced_M_integral
    !
@@ -2504,7 +2402,7 @@ contains
    ! Calls: is_triangle().
    !--------------------------------------------------------------------
       !
-      integer, intent(in)           :: totalJ_i, totalJ_f
+      integer, intent(in)           :: totalJ_i, totalJ_f 
       character(len=1), intent(in)  :: parity_i, parity_f
       integer, intent(out)          :: nmult
       character(len=2), dimension(20), intent(out) :: mult
@@ -2588,8 +2486,8 @@ contains
    ! Allocates storage for information about the symmetry blocks of each
    ! determinant of the initial- and final-state determinant basis.
    ! This information later facilitates to 'recognize' easily which pairs
-   ! of determinant will have non-zero contributions on transition
-   ! probabilities. This information is kept in the (private and
+   ! of determinant will have non-zero contributions on transition 
+   ! probabilities. This information is kept in the (private and 
    ! allocatable) arrays reos_detsym_i and reos_detsym_f.
    !
    ! Calls: angular_momentum_j(), unpack_occupation_from_integer().
@@ -2600,7 +2498,7 @@ contains
       !
       type(determinant) :: determ           ! For test reasons
       allocate( determ%occupation(3) )
-      ! Determine the number of 'symmetry blocks' in the initial- and
+      ! Determine the number of 'symmetry blocks' in the initial- and 
       ! final-state determinant basis
       number_of_symmetry_blocks = 0
       do  kappa = -19,19
@@ -2677,9 +2575,9 @@ contains
                       i, sum(detsym), asf_final%det_set%number_of_electrons
             print *, "asf_final%det_set%determinant(i)%occupation(:) = ", &
                       asf_final%det_set%determinant(i)%occupation(:)
-            print *, "occupation = ",occupation(:)
-            call pack_occupation_in_integer(determ,3,occupation,norb)
-            print *, "determ%occupation(:) = ",determ%occupation(:)
+            print *, "occupation = ",occupation(:)  
+            call pack_occupation_in_integer(determ,3,occupation,norb)  
+            print *, "determ%occupation(:) = ",determ%occupation(:)  
             !! stop "reos_set_determinant_sym(): program stop B."
          end if
       end do
@@ -2777,8 +2675,8 @@ contains
             allocate(transition(i)%mline(j)%radial_int(             &
                                1:pqn_f_max,kappa_f_min:kappa_f_max, &
                                1:pqn_i_max,kappa_i_min:kappa_i_max) )
-            transition(i)%mline(j)%radial_int = zero
-            !
+            transition(i)%mline(j)%radial_int = zero 
+            !                
             do  i1 = 1,wave_final%number_of_rwf
                do  i2 = 1,wave_initial%number_of_rwf
                   pqn_f   = wave_final%rwf(i1)%orbital%n
@@ -2796,22 +2694,22 @@ contains
                    ! Deallocate the Bessel function arrays
                    !! if (allocated(transition(i)%bessel0)) then
                    !!    deallocate( transition(i)%bessel0 )
-                   !! end if
+                   !! end if 
                    !! if (allocated(transition(i)%bessel1)) then
                    !!    deallocate( transition(i)%bessel1 )
-                   !! end if
+                   !! end if 
                    !! if (allocated(transition(i)%bessel2)) then
                    !!    deallocate( transition(i)%bessel2 )
-                   !! end if
+                   !! end if 
                    !! if (allocated(transition(i)%bessel3)) then
                    !!    deallocate( transition(i)%bessel3 )
-                   !! end if
+                   !! end if 
                    !! if (allocated(transition(i)%bessel4)) then
                    !!    deallocate( transition(i)%bessel4 )
-                   !! end if
+                   !! end if 
                    !! if (allocated(transition(i)%bessel5)) then
                    !!    deallocate( transition(i)%bessel5 )
-                   !! end if
+                   !! end if 
                end do
             end do
          end do
@@ -2825,7 +2723,7 @@ contains
    !
    subroutine reos_set_transitions()
    !--------------------------------------------------------------------
-   ! Determines how many and which transitions need to be calculated and
+   ! Determines how many and which transitions need to be calculated and 
    ! initializes the array transitions of type(reos_transitions).
    ! The default is (for number_of_transitions == 0) that all transitions
    ! with a positive energy are calculated; for number_of_transitions /= 0,
@@ -2866,7 +2764,7 @@ contains
                   if ( (select_level_i(k) == asf_initial%asf(i)%level_No .or. &
                         select_level_i(k) == 0)                         .and. &
                        (select_level_f(k) == asf_final%asf(j)%level_No   .or. &
-                        select_level_f(k) == 0) ) then
+                        select_level_f(k) == 0) ) then 
                      call reos_select_multipoles(1*asf_initial%asf(i)%totalJ, &
                                                    asf_initial%asf(i)%parity, &
                            1*asf_final%asf(j)%totalJ,asf_final%asf(j)%parity, &
@@ -2939,7 +2837,7 @@ contains
                   if ( (select_level_i(k) == asf_initial%asf(i)%level_No .or. &
                         select_level_i(k) == 0)                         .and. &
                        (select_level_f(k) == asf_final%asf(j)%level_No   .or. &
-                        select_level_f(k) == 0) ) then
+                        select_level_f(k) == 0) ) then 
                      call reos_select_multipoles(1*asf_initial%asf(i)%totalJ, &
                                                    asf_initial%asf(i)%parity, &
                            1*asf_final%asf(j)%totalJ,asf_final%asf(j)%parity, &
@@ -3028,14 +2926,14 @@ contains
          transition(nt)%number_of_mlines = nmult
          allocate( transition(nt)%mline(1:nmult) )
          do  m = 1,nmult
-            transition(nt)%mline(m)%multipole  = mult(m)
-            transition(nt)%mline(m)%gauge      = gauge(m)
-            transition(nt)%mline(m)%amplitude  = zero
+            transition(nt)%mline(m)%multipole  = mult(m)    
+            transition(nt)%mline(m)%gauge      = gauge(m)    
+            transition(nt)%mline(m)%amplitude  = zero 
          end do
          !
          ! Calculate the Bessel function for the given transition
          ! energy; first allocate the array
-         yes0 = .false.;   yes1 = .false.    ! yes == Needs to be
+         yes0 = .false.;   yes1 = .false.    ! yes == Needs to be 
          yes2 = .false.;   yes3 = .false.    !        calculated ?
          yes4 = .false.;   yes5 = .false.
          do  m = 1,nmult
@@ -3090,13 +2988,13 @@ contains
    !
    subroutine reos_write_trn_file()
    !--------------------------------------------------------------------
-   ! Writes out a .trn transition energy and amplitude file for further
+   ! Writes out a .trn transition energy and amplitude file for further 
    ! data processing with the REOS program on stream 26.
    !
    ! Calls: file_open().
    !--------------------------------------------------------------------
       !
-      integer           :: i, j
+      integer           :: i, j 
       character(len=3)  :: month
       character(len=8)  :: cdate
       character(len=10) :: ctime
@@ -3118,7 +3016,7 @@ contains
              1pe14.7,")",3x,50(a2,1x,a9,1x,1pe14.7,3x))
       write(26,*)
       !
-      ! Get the date and time of day; append this information to the reos.trn
+      ! Get the date and time of day; append this information to the reos.trn 
       ! transition energy and amplitude file to facilitate identification of
       ! this file; this information is not to be read in
       !
